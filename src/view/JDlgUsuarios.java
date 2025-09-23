@@ -12,7 +12,7 @@ import tools.Util;
  *
  * @author eniof
  */
-public class JDlgCadastroUsuarios extends javax.swing.JDialog {
+public class JDlgUsuarios extends javax.swing.JDialog {
 
     private MaskFormatter mascaraCpf;
     private MaskFormatter mascaraRg;
@@ -22,9 +22,16 @@ public class JDlgCadastroUsuarios extends javax.swing.JDialog {
      * @param parent
      * @param modal
      */
-    public JDlgCadastroUsuarios(java.awt.Frame parent, boolean modal) {
+       boolean alterando = false;
+    
+    public JDlgUsuarios(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        setTitle("Usuarios");
+        setLocationRelativeTo(null);
+
+        Util.habilitar(false, jTextNome, jTextApelido, jFmtCpf, jFmtRg, jFmtDataNascimento, jCBNivel, jTextSenha1, jTextSenha2, jChkAtivo, jBtnConfirmar, jBtnCancelar,jBtnAlterar, jBtnExcluir);
+        
         try {
     // ... suas outras máscaras
     mascaraCpf = new MaskFormatter("###.###.###-##");
@@ -68,7 +75,7 @@ public class JDlgCadastroUsuarios extends javax.swing.JDialog {
         jChkAtivo = new javax.swing.JCheckBox();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox<>();
+        jCBNivel = new javax.swing.JComboBox<>();
         jLabel8 = new javax.swing.JLabel();
         jTextApelido = new javax.swing.JTextField();
         jLabel9 = new javax.swing.JLabel();
@@ -79,7 +86,7 @@ public class JDlgCadastroUsuarios extends javax.swing.JDialog {
         jBtnPesquisar = new javax.swing.JButton();
         jBtnAlterar = new javax.swing.JButton();
         jBtnIncluir = new javax.swing.JButton();
-        jBtnSalvar = new javax.swing.JButton();
+        jBtnConfirmar = new javax.swing.JButton();
         jBtnCancelar = new javax.swing.JButton();
         jTextSenha1 = new javax.swing.JPasswordField();
         jTextSenha2 = new javax.swing.JPasswordField();
@@ -164,7 +171,7 @@ public class JDlgCadastroUsuarios extends javax.swing.JDialog {
         jLabel7.setFont(new java.awt.Font("Georgia", 0, 12)); // NOI18N
         jLabel7.setText("Senha");
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Selecione", "Administrativo", "Vendedor", "Estagiario" }));
+        jCBNivel.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Selecione", "Administrativo", "Vendedor", "Estagiario" }));
 
         jLabel8.setFont(new java.awt.Font("Georgia", 0, 12)); // NOI18N
         jLabel8.setText("Apelido");
@@ -213,24 +220,52 @@ public class JDlgCadastroUsuarios extends javax.swing.JDialog {
             }
         });
 
-        jBtnSalvar.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        jBtnSalvar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/ok.png"))); // NOI18N
-        jBtnSalvar.setText("Salvar");
-        jBtnSalvar.addActionListener(new java.awt.event.ActionListener() {
+        jBtnConfirmar.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jBtnConfirmar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/ok.png"))); // NOI18N
+        jBtnConfirmar.setText("Salvar");
+        jBtnConfirmar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBtnSalvarActionPerformed(evt);
+                jBtnConfirmarActionPerformed(evt);
             }
         });
 
         jBtnCancelar.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jBtnCancelar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/cancelar.png"))); // NOI18N
         jBtnCancelar.setText("Cancelar");
+        jBtnCancelar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnCancelarActionPerformed(evt);
+            }
+        });
+
+        jTextSenha2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextSenha2ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(2, 2, 2)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel1)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jBtnIncluir)
+                        .addGap(2, 2, 2)
+                        .addComponent(jBtnPesquisar)
+                        .addGap(2, 2, 2)
+                        .addComponent(jBtnAlterar)
+                        .addGap(2, 2, 2)
+                        .addComponent(jBtnConfirmar)))
+                .addGap(3, 3, 3)
+                .addComponent(jBtnCancelar)
+                .addGap(3, 3, 3)
+                .addComponent(jBtnExcluir)
+                .addGap(2, 2, 2))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(56, 56, 56)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel3)
@@ -240,7 +275,7 @@ public class JDlgCadastroUsuarios extends javax.swing.JDialog {
                     .addComponent(jLabel2)
                     .addComponent(jTextApelido, javax.swing.GroupLayout.DEFAULT_SIZE, 170, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel9)
@@ -263,27 +298,10 @@ public class JDlgCadastroUsuarios extends javax.swing.JDialog {
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jLabel6)
-                            .addComponent(jComboBox1, 0, 132, Short.MAX_VALUE))
+                            .addComponent(jCBNivel, 0, 132, Short.MAX_VALUE))
                         .addGap(80, 80, 80)
                         .addComponent(jChkAtivo)))
                 .addGap(76, 76, 76))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(13, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel1)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jBtnIncluir)
-                        .addGap(3, 3, 3)
-                        .addComponent(jBtnAlterar)
-                        .addGap(3, 3, 3)
-                        .addComponent(jBtnSalvar)
-                        .addGap(3, 3, 3)
-                        .addComponent(jBtnPesquisar)))
-                .addGap(3, 3, 3)
-                .addComponent(jBtnCancelar)
-                .addGap(3, 3, 3)
-                .addComponent(jBtnExcluir)
-                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -305,7 +323,7 @@ public class JDlgCadastroUsuarios extends javax.swing.JDialog {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel6)
                         .addGap(3, 3, 3)
-                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jCBNivel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
@@ -334,16 +352,15 @@ public class JDlgCadastroUsuarios extends javax.swing.JDialog {
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(12, 12, 12)
                                 .addComponent(jChkAtivo)))))
-                .addGap(39, 39, 39)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jBtnSalvar, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jBtnExcluir)
-                        .addComponent(jBtnAlterar)
-                        .addComponent(jBtnIncluir)
-                        .addComponent(jBtnPesquisar)
-                        .addComponent(jBtnCancelar)))
-                .addGap(15, 15, 15))
+                .addGap(50, 50, 50)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jBtnExcluir)
+                    .addComponent(jBtnIncluir)
+                    .addComponent(jBtnPesquisar)
+                    .addComponent(jBtnCancelar)
+                    .addComponent(jBtnConfirmar, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(jBtnAlterar))
+                .addContainerGap(15, Short.MAX_VALUE))
         );
 
         pack();
@@ -373,19 +390,26 @@ public class JDlgCadastroUsuarios extends javax.swing.JDialog {
 
     private void jBtnIncluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnIncluirActionPerformed
         // TODO add your handling code here:
+        Util.habilitar(true, jTextNome, jTextApelido, jFmtCpf, jFmtRg, jFmtDataNascimento, jCBNivel, jTextSenha1, jTextSenha2, jBtnConfirmar, jBtnCancelar);
+  Util.habilitar(false,jBtnPesquisar, jBtnIncluir, jBtnAlterar, jBtnExcluir);
+        Util.limpaCampos(jTextNome, jTextApelido, jFmtCpf, jFmtRg, jFmtDataNascimento, jCBNivel, jTextSenha1, jTextSenha2);
     }//GEN-LAST:event_jBtnIncluirActionPerformed
 
-    private void jBtnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnSalvarActionPerformed
+    private void jBtnConfirmarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnConfirmarActionPerformed
         // TODO add your handling code here:
+        //UsuariosDAO  usuariosDAO= new UsuariosDAO();
+        //UsuariosDAO.insert(viewBean);
+        Util.habilitar(false);
+        Util.limpaCampos();
     String senha1 = new String(jTextSenha1.getPassword());
     String senha2 = new String(jTextSenha2.getPassword());
 
     if (senha1.equals(senha2) == false) {
-        // Se forem diferentes, mostra um erro e para a execução do método
+
         javax.swing.JOptionPane.showMessageDialog(this, "As senhas não conferem!", "Erro", javax.swing.JOptionPane.ERROR_MESSAGE);
-        return; // O return é MUITO importante para parar o código aqui
+        return;
     }
-    }//GEN-LAST:event_jBtnSalvarActionPerformed
+    }//GEN-LAST:event_jBtnConfirmarActionPerformed
 
     private void jTextNomeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextNomeActionPerformed
         // TODO add your handling code here:
@@ -402,6 +426,17 @@ public class JDlgCadastroUsuarios extends javax.swing.JDialog {
     private void jTextApelidoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextApelidoActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jTextApelidoActionPerformed
+
+    private void jBtnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnCancelarActionPerformed
+        // TODO add your handling code here:
+        Util.habilitar(false, jTextNome, jTextApelido, jFmtCpf, jFmtRg, jFmtDataNascimento, jCBNivel, jTextSenha1, jTextSenha2);
+        Util.limpaCampos(jTextNome, jTextApelido, jFmtCpf, jFmtRg, jFmtDataNascimento, jCBNivel, jTextSenha1, jTextSenha2);
+            alterando = false;
+    }//GEN-LAST:event_jBtnCancelarActionPerformed
+
+    private void jTextSenha2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextSenha2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextSenha2ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -420,8 +455,10 @@ public class JDlgCadastroUsuarios extends javax.swing.JDialog {
                 }
             }
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(JDlgCadastroUsuarios.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(JDlgUsuarios.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        //</editor-fold>
         //</editor-fold>
         //</editor-fold>
         
@@ -430,7 +467,7 @@ public class JDlgCadastroUsuarios extends javax.swing.JDialog {
 
         /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(() -> {
-            JDlgCadastroUsuarios dialog = new JDlgCadastroUsuarios(new javax.swing.JFrame(), true);
+            JDlgUsuarios dialog = new JDlgUsuarios(new javax.swing.JFrame(), true);
             dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                 @Override
                 public void windowClosing(java.awt.event.WindowEvent e) {
@@ -444,18 +481,18 @@ public class JDlgCadastroUsuarios extends javax.swing.JDialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jBtnAlterar;
     private javax.swing.JButton jBtnCancelar;
+    private javax.swing.JButton jBtnConfirmar;
     private javax.swing.JButton jBtnExcluir;
     private javax.swing.JButton jBtnIncluir;
     private javax.swing.JButton jBtnPesquisar;
-    private javax.swing.JButton jBtnSalvar;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
+    private javax.swing.JComboBox<String> jCBNivel;
     private javax.swing.JCheckBox jChkAtivo;
-    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JFormattedTextField jFmtCpf;
     private javax.swing.JFormattedTextField jFmtDataNascimento;
     private javax.swing.JFormattedTextField jFmtRg;

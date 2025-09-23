@@ -12,20 +12,27 @@ import tools.Util;
  *
  * @author eniof
  */
-public class JDlgCadastroLivros extends javax.swing.JDialog {
+
+public class JDlgLivros extends javax.swing.JDialog {
         private MaskFormatter mascaraAno;
         private MaskFormatter mascaraPreco;
     
     
    boolean alterando = false;
-    public JDlgCadastroLivros(java.awt.Frame parent, boolean modal) {
+   
+    public JDlgLivros(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        setTitle("Livros");
+        setLocationRelativeTo(null);
+
+        Util.habilitar(false, jTextTitulo, jTextCodigo, jFmtAnoPublicado, jTextGenero, jTextAutor, jTextEditora, jFmtPreco, jBtnConfirmar, jBtnCancelar,jBtnAlterar, jBtnExcluir);
+        
+
           try {
-    // ... suas outras máscaras
     mascaraAno = new MaskFormatter("####");
     
-    // ... suas outras aplicações de máscara
+
     jFmtAnoPublicado.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(mascaraAno));
     
 
@@ -37,7 +44,6 @@ public class JDlgCadastroLivros extends javax.swing.JDialog {
     Util.validarLetras(jTextAutor, 100);
     Util.validarLetras(jTextEditora, 50);
     Util.validarNumeros(jTextCodigo, 10);
-    Util.validarNumeros(jTextEstoque, 5);
     Util.validarNumeros(jFmtPreco, 100);
     }
 /**
@@ -55,7 +61,6 @@ public class JDlgCadastroLivros extends javax.swing.JDialog {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jTextTitulo = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
@@ -74,8 +79,6 @@ public class JDlgCadastroLivros extends javax.swing.JDialog {
         jBtnAlterar = new javax.swing.JButton();
         jBtnIncluir = new javax.swing.JButton();
         jLabel8 = new javax.swing.JLabel();
-        jLabel9 = new javax.swing.JLabel();
-        jTextEstoque = new javax.swing.JTextField();
         jFmtAnoPublicado = new javax.swing.JFormattedTextField();
         jFmtPreco = new javax.swing.JFormattedTextField();
 
@@ -91,10 +94,6 @@ public class JDlgCadastroLivros extends javax.swing.JDialog {
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-
-        jLabel1.setFont(new java.awt.Font("Tahoma", 1, 22)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(169, 169, 169));
-        jLabel1.setText("Cadastro Livro");
 
         jLabel2.setFont(new java.awt.Font("Georgia", 0, 12)); // NOI18N
         jLabel2.setText("Titulo");
@@ -138,6 +137,11 @@ public class JDlgCadastroLivros extends javax.swing.JDialog {
         jBtnCancelar.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jBtnCancelar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/cancelar.png"))); // NOI18N
         jBtnCancelar.setText("Cancelar");
+        jBtnCancelar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnCancelarActionPerformed(evt);
+            }
+        });
 
         jBtnExcluir.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jBtnExcluir.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Excluir.png"))); // NOI18N
@@ -168,9 +172,6 @@ public class JDlgCadastroLivros extends javax.swing.JDialog {
         jLabel8.setFont(new java.awt.Font("Georgia", 0, 12)); // NOI18N
         jLabel8.setText("Preço");
 
-        jLabel9.setFont(new java.awt.Font("Georgia", 0, 12)); // NOI18N
-        jLabel9.setText("Estoque");
-
         jFmtPreco.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jFmtPrecoActionPerformed(evt);
@@ -182,23 +183,19 @@ public class JDlgCadastroLivros extends javax.swing.JDialog {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(2, 2, 2)
                 .addComponent(jBtnIncluir)
-                .addGap(3, 3, 3)
-                .addComponent(jBtnAlterar)
-                .addGap(3, 3, 3)
-                .addComponent(jBtnConfirmar)
-                .addGap(3, 3, 3)
+                .addGap(2, 2, 2)
                 .addComponent(jBtnPesquisar)
-                .addGap(3, 3, 3)
+                .addGap(2, 2, 2)
+                .addComponent(jBtnAlterar)
+                .addGap(2, 2, 2)
+                .addComponent(jBtnConfirmar)
+                .addGap(2, 2, 2)
                 .addComponent(jBtnCancelar)
-                .addGap(3, 3, 3)
+                .addGap(2, 2, 2)
                 .addComponent(jBtnExcluir)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(217, 217, 217)
-                .addComponent(jLabel1)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addGap(2, 2, 2))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(68, 68, 68)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -209,7 +206,7 @@ public class JDlgCadastroLivros extends javax.swing.JDialog {
                         .addComponent(jTextTitulo)
                         .addComponent(jTextCodigo, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jFmtAnoPublicado, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(35, 35, 35)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel7)
                     .addComponent(jLabel5)
@@ -217,20 +214,16 @@ public class JDlgCadastroLivros extends javax.swing.JDialog {
                     .addComponent(jTextGenero)
                     .addComponent(jTextAutor)
                     .addComponent(jTextEditora, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(35, 35, 35)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel9)
-                    .addComponent(jTextEstoque, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel8)
                     .addComponent(jFmtPreco, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(45, 45, 45))
+                .addGap(48, 48, 48))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(17, 17, 17)
-                .addComponent(jLabel1)
-                .addGap(18, 18, 18)
+                .addGap(20, 20, 20)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -241,19 +234,17 @@ public class JDlgCadastroLivros extends javax.swing.JDialog {
                             .addComponent(jTextTitulo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jTextGenero, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel9)
+                        .addComponent(jLabel8)
                         .addGap(5, 5, 5)
-                        .addComponent(jTextEstoque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jFmtPreco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(13, 13, 13)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
-                    .addComponent(jLabel5)
-                    .addComponent(jLabel8))
+                    .addComponent(jLabel5))
                 .addGap(5, 5, 5)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jTextCodigo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextAutor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jFmtPreco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jTextAutor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(13, 13, 13)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
@@ -263,15 +254,14 @@ public class JDlgCadastroLivros extends javax.swing.JDialog {
                     .addComponent(jTextEditora, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jFmtAnoPublicado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jBtnExcluir)
+                    .addComponent(jBtnIncluir)
+                    .addComponent(jBtnPesquisar)
+                    .addComponent(jBtnCancelar)
                     .addComponent(jBtnConfirmar, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jBtnExcluir)
-                        .addComponent(jBtnAlterar)
-                        .addComponent(jBtnIncluir)
-                        .addComponent(jBtnPesquisar)
-                        .addComponent(jBtnCancelar)))
-                .addGap(15, 15, 15))
+                    .addComponent(jBtnAlterar))
+                .addContainerGap(15, Short.MAX_VALUE))
         );
 
         pack();
@@ -279,20 +269,24 @@ public class JDlgCadastroLivros extends javax.swing.JDialog {
 
     private void jBtnPesquisarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnPesquisarActionPerformed
         // TODO add your handling code here:
-         JDlgPesquisaLivros dlgPesquisaLivros = new JDlgPesquisaLivros(null, true);
-        dlgPesquisaLivros.setVisible(true);
+         JDlgPesquisaLivros jdlgPesquisaLivros = new JDlgPesquisaLivros(null, true);
+         //jdlgPesquisaLivros.setTelaAnterior(this);
+         jdlgPesquisaLivros.setVisible(true);
     }//GEN-LAST:event_jBtnPesquisarActionPerformed
 
     private void jBtnIncluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnIncluirActionPerformed
         // TODO add your handling code here:
-    Util.limpaCampos(jTextTitulo, jTextCodigo, jFmtAnoPublicado, jTextGenero, jTextAutor, jTextEditora, jTextEstoque, jFmtPreco);
-    Util.habilitaBotoes(jBtnIncluir, jBtnAlterar, jBtnExcluir, jBtnConfirmar, jBtnCancelar, jBtnPesquisar, false);
-    
-    boolean incluindo = true;
+  Util.habilitar(true, jTextTitulo, jTextCodigo, jFmtAnoPublicado, jTextGenero, jTextAutor, jTextEditora, jFmtPreco, jBtnConfirmar, jBtnCancelar);
+  Util.habilitar(false,jBtnPesquisar, jBtnIncluir, jBtnAlterar, jBtnExcluir);
+        Util.limpaCampos(jTextTitulo, jTextCodigo, jFmtAnoPublicado, jTextGenero, jTextAutor, jTextEditora, jFmtPreco);
     }//GEN-LAST:event_jBtnIncluirActionPerformed
 
     private void jBtnConfirmarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnConfirmarActionPerformed
         // TODO add your handling code here:
+        //LivrosDAO  livrosDAO= new LivrosDAO();
+        //livrosDAO.insert(viewBean);
+        Util.habilitar(false);
+        Util.limpaCampos();
     }//GEN-LAST:event_jBtnConfirmarActionPerformed
 
     private void jTextTituloActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextTituloActionPerformed
@@ -306,6 +300,13 @@ public class JDlgCadastroLivros extends javax.swing.JDialog {
     private void jTextCodigoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextCodigoActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jTextCodigoActionPerformed
+
+    private void jBtnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnCancelarActionPerformed
+        // TODO add your handling code here:
+        Util.habilitar(false, jTextTitulo, jTextCodigo, jFmtAnoPublicado, jTextGenero, jTextAutor, jTextEditora, jFmtPreco);
+        Util.limpaCampos(jTextTitulo, jTextCodigo, jFmtAnoPublicado, jTextGenero, jTextAutor, jTextEditora, jFmtPreco);
+            alterando = false;
+    }//GEN-LAST:event_jBtnCancelarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -324,8 +325,10 @@ public class JDlgCadastroLivros extends javax.swing.JDialog {
                 }
             }
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(JDlgCadastroLivros.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(JDlgLivros.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        //</editor-fold>
         //</editor-fold>
         //</editor-fold>
         
@@ -334,7 +337,7 @@ public class JDlgCadastroLivros extends javax.swing.JDialog {
 
         /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(() -> {
-            JDlgCadastroLivros dialog = new JDlgCadastroLivros(new javax.swing.JFrame(), true);
+            JDlgLivros dialog = new JDlgLivros(new javax.swing.JFrame(), true);
             dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                 @Override
                 public void windowClosing(java.awt.event.WindowEvent e) {
@@ -354,7 +357,6 @@ public class JDlgCadastroLivros extends javax.swing.JDialog {
     private javax.swing.JButton jBtnPesquisar;
     private javax.swing.JFormattedTextField jFmtAnoPublicado;
     private javax.swing.JFormattedTextField jFmtPreco;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -362,12 +364,10 @@ public class JDlgCadastroLivros extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JTextField jTextAutor;
     private javax.swing.JTextField jTextCodigo;
     private javax.swing.JTextField jTextEditora;
-    private javax.swing.JTextField jTextEstoque;
     private javax.swing.JTextField jTextGenero;
     private javax.swing.JTextField jTextTitulo;
     // End of variables declaration//GEN-END:variables

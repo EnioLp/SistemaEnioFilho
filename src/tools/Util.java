@@ -1,41 +1,32 @@
 package tools;
 
-import javax.swing.JButton;
 import javax.swing.JComponent;
+
 import javax.swing.JTextField;
-import javax.swing.JFormattedTextField;
-import javax.swing.JComboBox;
-import javax.swing.JCheckBox;
+
 
 public class Util {
-
-    public static void habilitaBotoes(JButton incluir, JButton alterar, JButton excluir, JButton confirmar, JButton cancelar, JButton pesquisar, boolean estado) {
-        incluir.setEnabled(estado);
-        alterar.setEnabled(estado);
-        excluir.setEnabled(estado);
-        confirmar.setEnabled(!estado);
-        cancelar.setEnabled(!estado);
-        pesquisar.setEnabled(estado);
+    
+ public static void habilitar(boolean valor, JComponent... componentes) {
+        // A condição do laço 'for' foi corrigida para 'i < componentes.length'
+        for (int i = 0; i < componentes.length; i++) {
+            componentes[i].setEnabled(valor);
+        }
     }
 
     /**
-     * Limpa o conteúdo de uma lista de componentes na tela.
-     * @param componentes Lista de JComponent a serem limpos.
+     * @param componentes
      */
     public static void limpaCampos(JComponent... componentes) {
-         for (JComponent componente : componentes) {
-        if (componente instanceof JTextField) {
-            ((JTextField) componente).setText("");
-        } else if (componente instanceof JFormattedTextField) {
-            ((JFormattedTextField) componente).setValue(null);
-        } else if (componente instanceof JComboBox) {
-            ((JComboBox) componente).setSelectedIndex(-1);
-        } else if (componente instanceof JCheckBox) {
-            ((JCheckBox) componente).setSelected(false);
+        // O laço 'for' que estava faltando
+        for (JComponent componente : componentes) {
+            // Verifica se o componente atual é um JTextField
+            if (componente instanceof JTextField) {
+                // Se for, faz o "cast" e define seu texto como uma string vazia
+                ((JTextField) componente).setText("");
+            }
         }
-        }
-    }
-    
+}
       public static void validarLetras(javax.swing.JTextField textField, int maxLength) {
         ((javax.swing.text.AbstractDocument) textField.getDocument()).setDocumentFilter(new javax.swing.text.DocumentFilter() {
             
@@ -68,7 +59,7 @@ public class Util {
                 if (string == null) {
                     return;
                 }
-                // Converte a string para maiúsculo ANTES de validar e inserir
+
                 String textoMaiusculo = string.toUpperCase();
                 
                 if ((fb.getDocument().getLength() + textoMaiusculo.length()) <= maxLength && textoMaiusculo.matches("[A-Z\\s]*")) {
@@ -81,7 +72,7 @@ public class Util {
                 if (text == null) {
                     return;
                 }
-                // Converte o texto para maiúsculo ANTES de validar e substituir
+                
                 String textoMaiusculo = text.toUpperCase();
 
                 if ((fb.getDocument().getLength() - length + textoMaiusculo.length()) <= maxLength && textoMaiusculo.matches("[A-Z\\s]*")) {
@@ -98,7 +89,7 @@ public class Util {
                 if (string == null) {
                     return;
                 }
-                // Verifica o tamanho e se contém apenas dígitos
+                
                 if ((fb.getDocument().getLength() + string.length()) <= maxLength && string.matches("[0-9]*")) {
                     super.insertString(fb, offset, string, attr);
                 }
@@ -109,11 +100,11 @@ public class Util {
                 if (text == null) {
                     return;
                 }
-                // Verifica o tamanho e se contém apenas dígitos
+                
                 if ((fb.getDocument().getLength() - length + text.length()) <= maxLength && text.matches("[0-9]*")) {
                     super.replace(fb, offset, length, text, attrs);
                 }
             }
         });
     }
-}
+            }
