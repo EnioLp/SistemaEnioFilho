@@ -1,56 +1,83 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package view;
 
+import DAO.UsuariosDAO;
+import bean.Usuarios;
+import javax.swing.JOptionPane;
 import javax.swing.text.MaskFormatter;
 import tools.Util;
 
-/**
- *
- * @author eniof
- */
 public class JDlgUsuarios extends javax.swing.JDialog {
+    private UsuariosDAO usuariosDAO;
+    private Usuarios usuarios;
+    private boolean incluindo;
 
     private MaskFormatter mascaraCpf;
     private MaskFormatter mascaraRg;
     private MaskFormatter mascaraDataNascimento;
-    /**
-     * Creates new form JDlgCadastroUsuario
-     * @param parent
-     * @param modal
-     */
-       boolean alterando = false;
-    
+
     public JDlgUsuarios(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        setTitle("Usuarios");
+        setTitle("Cadastro de Usuários");
         setLocationRelativeTo(null);
-
-        Util.habilitar(false, jTextNome, jTextApelido, jFmtCpf, jFmtRg, jFmtDataNascimento, jCBNivel, jTextSenha1, jTextSenha2, jChkAtivo, jBtnConfirmar, jBtnCancelar,jBtnAlterar, jBtnExcluir);
         
+        usuariosDAO = new UsuariosDAO();
+        defineEstadoInicial();
         try {
-    // ... suas outras máscaras
-    mascaraCpf = new MaskFormatter("###.###.###-##");
-    mascaraRg = new MaskFormatter("##.###.###-#");
-    mascaraDataNascimento = new MaskFormatter("##/##/####");
+            mascaraCpf = new MaskFormatter("###.###.###-##");
+            mascaraRg = new MaskFormatter("##.###.###-#");
+            mascaraDataNascimento = new MaskFormatter("##/##/####");
+            jFmtCpf.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(mascaraCpf));
+            jFmtRg.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(mascaraRg));
+            jFmtDataNascimento.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(mascaraDataNascimento));
+        } catch (java.text.ParseException ex) {
+            System.err.println("Erro na formatação: " + ex.getMessage());
+        }
+    }
     
-    // ... suas outras aplicações de máscara
-    jFmtCpf.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(mascaraCpf));
-    jFmtRg.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(mascaraRg));
-    jFmtDataNascimento.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(mascaraDataNascimento));
-    
+    public void defineEstadoInicial() {
+        Util.habilitar(true, jBtnIncluir, jBtnPesquisar);
+        Util.habilitar(false, jBtnAlterar, jBtnExcluir, jBtnConfirmar, jBtnCancelar);
+        Util.habilitar(false, jTextNome, jTextApelido, jFmtCpf, jFmtRg, jFmtDataNascimento, jCBNivel, jTextSenha1, jTextSenha2, jChkAtivo);
+        Util.limpaCampos(jTextNome, jTextApelido, jFmtCpf, jFmtRg, jFmtDataNascimento, jTextSenha1, jTextSenha2);
+        jChkAtivo.setSelected(false);
+        jCBNivel.setSelectedIndex(0);
+    }
 
-} catch (java.text.ParseException ex) {
-    System.err.println("Erro na formatação: " + ex.getMessage());
-}
-    Util.validarLetras(jTextNome, 100);  
-    Util.validarLetras(jTextApelido, 50);
-}
-    
+    public Usuarios viewBean() {
+        Usuarios usuarioNovo = new Usuarios();
+
+        if (this.usuarios != null) { 
+            usuarioNovo.setIdUsuario(this.usuarios.getIdUsuario());
+        }
+
+        usuarioNovo.setNome(jTextNome.getText());
+        usuarioNovo.setApelido(jTextApelido.getText());
+        usuarioNovo.setCpf(jFmtCpf.getText());
+        usuarioNovo.setRg(jFmtRg.getText());
+        usuarioNovo.setDataNascimento(Util.strToDate(jFmtDataNascimento.getText()));
+        usuarioNovo.setNivelAcesso(jCBNivel.getSelectedIndex());
+        usuarioNovo.setSenha(new String(jTextSenha2.getPassword()));
+        usuarioNovo.setNivelAcesso(jCBNivel.getSelectedIndex() + 1);
+        usuarioNovo.setAtivo(jChkAtivo.isSelected());
+         System.out.println("Salvando usuário com ID: " + usuarioNovo.getIdUsuario());
+        return usuarioNovo;
+    }
+
+    public void beanView(Usuarios usuarios) {
+        this.usuarios = usuarios;
+        jTextNome.setText(usuarios.getNome());
+        jTextApelido.setText(usuarios.getApelido());
+        jFmtCpf.setText(usuarios.getCpf());
+        jFmtRg.setText(usuarios.getRg());
+        jFmtDataNascimento.setText(Util.dateToStr(usuarios.getDataNascimento()));
+        jCBNivel.setSelectedIndex(usuarios.getNivelAcesso() - 1);
+        jTextSenha1.setText(usuarios.getSenha());
+        jTextSenha2.setText(usuarios.getSenha());
+       jChkAtivo.setSelected(usuarios.isAtivo()); 
+        
+        
+    }  
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -171,7 +198,12 @@ public class JDlgUsuarios extends javax.swing.JDialog {
         jLabel7.setFont(new java.awt.Font("Georgia", 0, 12)); // NOI18N
         jLabel7.setText("Senha");
 
-        jCBNivel.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Selecione", "Administrativo", "Vendedor", "Estagiario" }));
+        jCBNivel.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Administrativo", "Vendedor", "Estagiario" }));
+        jCBNivel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCBNivelActionPerformed(evt);
+            }
+        });
 
         jLabel8.setFont(new java.awt.Font("Georgia", 0, 12)); // NOI18N
         jLabel8.setText("Apelido");
@@ -197,6 +229,11 @@ public class JDlgUsuarios extends javax.swing.JDialog {
         jBtnExcluir.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jBtnExcluir.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Excluir.png"))); // NOI18N
         jBtnExcluir.setText("Excluir");
+        jBtnExcluir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnExcluirActionPerformed(evt);
+            }
+        });
 
         jBtnPesquisar.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jBtnPesquisar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/pesquisar.png"))); // NOI18N
@@ -210,6 +247,11 @@ public class JDlgUsuarios extends javax.swing.JDialog {
         jBtnAlterar.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jBtnAlterar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/alterar.png"))); // NOI18N
         jBtnAlterar.setText("Alterar");
+        jBtnAlterar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnAlterarActionPerformed(evt);
+            }
+        });
 
         jBtnIncluir.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jBtnIncluir.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/incluir.png"))); // NOI18N
@@ -248,8 +290,8 @@ public class JDlgUsuarios extends javax.swing.JDialog {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(2, 2, 2)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jLabel1)
                     .addGroup(layout.createSequentialGroup()
@@ -265,18 +307,18 @@ public class JDlgUsuarios extends javax.swing.JDialog {
                 .addGap(3, 3, 3)
                 .addComponent(jBtnExcluir)
                 .addGap(2, 2, 2))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(56, 56, 56)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(66, 66, 66)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel3)
                     .addComponent(jFmtCpf)
-                    .addComponent(jTextNome, javax.swing.GroupLayout.DEFAULT_SIZE, 170, Short.MAX_VALUE)
+                    .addComponent(jTextNome)
                     .addComponent(jLabel8)
                     .addComponent(jLabel2)
-                    .addComponent(jTextApelido, javax.swing.GroupLayout.DEFAULT_SIZE, 170, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jTextApelido, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
+                        .addGap(20, 20, 20)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel9)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
@@ -285,82 +327,76 @@ public class JDlgUsuarios extends javax.swing.JDialog {
                             .addComponent(jLabel4))
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addGap(62, 62, 62)
-                                .addComponent(jLabel7))
-                            .addGroup(layout.createSequentialGroup()
                                 .addGap(61, 61, 61)
-                                .addComponent(jLabel10))
+                                .addComponent(jTextSenha2, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addGap(61, 61, 61)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jTextSenha1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jTextSenha2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                    .addComponent(jLabel7)
+                                    .addComponent(jTextSenha1, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel10)))))
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jLabel6)
-                            .addComponent(jCBNivel, 0, 132, Short.MAX_VALUE))
-                        .addGap(80, 80, 80)
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jCBNivel, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel6))
+                        .addGap(82, 82, 82)
                         .addComponent(jChkAtivo)))
-                .addGap(76, 76, 76))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel1)
-                .addGap(14, 14, 14)
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel9)
-                        .addGap(3, 3, 3)
-                        .addComponent(jFmtRg, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(10, 10, 10)
-                        .addComponent(jLabel4)
-                        .addGap(3, 3, 3)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jFmtDataNascimento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jTextSenha2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel6)
-                        .addGap(3, 3, 3)
-                        .addComponent(jCBNivel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(1, 1, 1)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jTextSenha1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(jLabel10)
-                                        .addGap(23, 23, 23))
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jLabel2)
-                                        .addGap(3, 3, 3)
-                                        .addComponent(jTextNome, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(10, 10, 10)
-                                        .addComponent(jLabel8)
-                                        .addGap(3, 3, 3)
-                                        .addComponent(jTextApelido, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(jLabel9)
                             .addComponent(jLabel7))
+                        .addGap(3, 3, 3)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jFmtRg, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jTextSenha1, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(10, 10, 10)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel10)
+                            .addComponent(jLabel4))
+                        .addGap(3, 3, 3)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jTextSenha2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jFmtDataNascimento, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addGap(3, 3, 3)
+                        .addComponent(jTextNome, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(10, 10, 10)
+                        .addComponent(jLabel8)
+                        .addGap(3, 3, 3)
+                        .addComponent(jTextApelido, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(10, 10, 10)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel3)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel3)
+                                    .addComponent(jLabel6))
                                 .addGap(3, 3, 3)
-                                .addComponent(jFmtCpf, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jFmtCpf, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jCBNivel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(12, 12, 12)
                                 .addComponent(jChkAtivo)))))
-                .addGap(50, 50, 50)
+                .addGap(20, 20, 20)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jBtnExcluir)
                     .addComponent(jBtnIncluir)
                     .addComponent(jBtnPesquisar)
                     .addComponent(jBtnCancelar)
-                    .addComponent(jBtnConfirmar, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(jBtnConfirmar, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jBtnAlterar))
-                .addContainerGap(15, Short.MAX_VALUE))
+                .addGap(5, 5, 5))
         );
 
         pack();
@@ -383,32 +419,45 @@ public class JDlgUsuarios extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jBtnPesquisarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnPesquisarActionPerformed
-        // TODO add your handling code here:
-        JDlgPesquisaUsuarios dlgPesquisaUsuarios = new JDlgPesquisaUsuarios(null, true);
-        dlgPesquisaUsuarios.setVisible(true);
+    JDlgPesquisaUsuarios jDlgPesquisa = new JDlgPesquisaUsuarios(null, true, this);
+    jDlgPesquisa.setVisible(true);
+    Util.habilitar(true, jBtnAlterar, jBtnExcluir, jBtnCancelar);
+    Util.habilitar(false, jBtnIncluir, jBtnConfirmar, jBtnPesquisar);
     }//GEN-LAST:event_jBtnPesquisarActionPerformed
 
     private void jBtnIncluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnIncluirActionPerformed
-        // TODO add your handling code here:
-        Util.habilitar(true, jTextNome, jTextApelido, jFmtCpf, jFmtRg, jFmtDataNascimento, jCBNivel, jTextSenha1, jTextSenha2, jBtnConfirmar, jBtnCancelar);
-  Util.habilitar(false,jBtnPesquisar, jBtnIncluir, jBtnAlterar, jBtnExcluir);
-        Util.limpaCampos(jTextNome, jTextApelido, jFmtCpf, jFmtRg, jFmtDataNascimento, jCBNivel, jTextSenha1, jTextSenha2);
+        incluindo = true;
+        this.usuarios = null;
+        Util.habilitar(true, jTextNome, jTextApelido, jFmtCpf, jFmtRg, jFmtDataNascimento, jCBNivel, jTextSenha1, jTextSenha2, jChkAtivo, jBtnConfirmar, jBtnCancelar);
+        Util.habilitar(false, jBtnIncluir, jBtnAlterar, jBtnExcluir, jBtnPesquisar);
+        Util.limpaCampos(jTextNome, jTextApelido, jFmtCpf, jFmtRg, jFmtDataNascimento, jTextSenha1, jTextSenha2);
     }//GEN-LAST:event_jBtnIncluirActionPerformed
 
     private void jBtnConfirmarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnConfirmarActionPerformed
-        // TODO add your handling code here:
-        //UsuariosDAO  usuariosDAO= new UsuariosDAO();
-        //UsuariosDAO.insert(viewBean);
-        Util.habilitar(false);
-        Util.limpaCampos();
-    String senha1 = new String(jTextSenha1.getPassword());
-    String senha2 = new String(jTextSenha2.getPassword());
-
-    if (senha1.equals(senha2) == false) {
-
-        javax.swing.JOptionPane.showMessageDialog(this, "As senhas não conferem!", "Erro", javax.swing.JOptionPane.ERROR_MESSAGE);
+        String senha1 = new String(jTextSenha1.getPassword());
+        String senha2 = new String(jTextSenha2.getPassword());
+        if (!senha1.equals(senha2)) {
+            JOptionPane.showMessageDialog(this, "As senhas não conferem!", "Erro", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (jTextNome.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "O campo 'Nome' é obrigatório.", "Erro", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (!Util.isCpfValido(jFmtCpf.getText())) {
+        Util.mostrar("O CPF digitado é inválido!");
         return;
     }
+        Usuarios usuarioParaSalvar = viewBean();
+        if (incluindo) {
+            usuariosDAO.insert(usuarioParaSalvar);
+            JOptionPane.showMessageDialog(this, "Usuário incluído com sucesso!");
+        } else {
+            usuariosDAO.update(usuarioParaSalvar);
+
+            JOptionPane.showMessageDialog(this, "Usuário alterado com sucesso!");
+        }
+        defineEstadoInicial();
     }//GEN-LAST:event_jBtnConfirmarActionPerformed
 
     private void jTextNomeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextNomeActionPerformed
@@ -428,15 +477,36 @@ public class JDlgUsuarios extends javax.swing.JDialog {
     }//GEN-LAST:event_jTextApelidoActionPerformed
 
     private void jBtnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnCancelarActionPerformed
-        // TODO add your handling code here:
-        Util.habilitar(false, jTextNome, jTextApelido, jFmtCpf, jFmtRg, jFmtDataNascimento, jCBNivel, jTextSenha1, jTextSenha2);
-        Util.limpaCampos(jTextNome, jTextApelido, jFmtCpf, jFmtRg, jFmtDataNascimento, jCBNivel, jTextSenha1, jTextSenha2);
-            alterando = false;
+        this.usuarios = null;
+        defineEstadoInicial();
     }//GEN-LAST:event_jBtnCancelarActionPerformed
 
     private void jTextSenha2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextSenha2ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jTextSenha2ActionPerformed
+
+    private void jCBNivelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCBNivelActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jCBNivelActionPerformed
+
+    private void jBtnAlterarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnAlterarActionPerformed
+        incluindo = false;
+        Util.habilitar(true, jTextNome, jTextApelido, jFmtCpf, jFmtRg, jFmtDataNascimento, jCBNivel, jTextSenha1, jTextSenha2, jChkAtivo, jBtnConfirmar, jBtnCancelar);
+        Util.habilitar(false, jBtnIncluir, jBtnAlterar, jBtnExcluir, jBtnPesquisar);
+   
+    }//GEN-LAST:event_jBtnAlterarActionPerformed
+
+    private void jBtnExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnExcluirActionPerformed
+           if (this.usuarios != null) {
+        if (Util.perguntar("Deseja realmente excluir o usuário '" + usuarios.getNome() + "'?")) {
+            usuariosDAO.delete(usuarios);
+            Util.mostrar("Usuário excluído com sucesso.");
+            defineEstadoInicial();
+        }
+    } else {
+        Util.mostrar("Nenhum usuário foi carregado para exclusão.");
+    }
+    }//GEN-LAST:event_jBtnExcluirActionPerformed
 
     /**
      * @param args the command line arguments
