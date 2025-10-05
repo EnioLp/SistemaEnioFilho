@@ -25,7 +25,7 @@ public class JDlgUsuarios extends javax.swing.JDialog {
         defineEstadoInicial();
         try {
             mascaraCpf = new MaskFormatter("###.###.###-##");
-            mascaraRg = new MaskFormatter("##.###.###-#");
+            mascaraRg = new MaskFormatter("#.###.###");
             mascaraDataNascimento = new MaskFormatter("##/##/####");
             jFmtCpf.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(mascaraCpf));
             jFmtRg.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(mascaraRg));
@@ -448,7 +448,13 @@ public class JDlgUsuarios extends javax.swing.JDialog {
         Util.mostrar("O CPF digitado é inválido!");
         return;
     }
+        
         Usuarios usuarioParaSalvar = viewBean();
+        if (usuariosDAO.cpfJaCadastrado(usuarioParaSalvar.getCpf())) {
+            Util.mostrar("Este CPF já está cadastrado no sistema.");
+            return;
+        }
+
         if (incluindo) {
             usuariosDAO.insert(usuarioParaSalvar);
             JOptionPane.showMessageDialog(this, "Usuário incluído com sucesso!");

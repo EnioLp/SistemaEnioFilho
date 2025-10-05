@@ -6,6 +6,8 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import DAO.HibernateUtil;
+import bean.Clientes;
+import org.hibernate.criterion.Restrictions;
 
 public class UsuariosDAO {
 
@@ -51,4 +53,15 @@ public class UsuariosDAO {
         session.close();
         return lista;
     }
+       public boolean cpfJaCadastrado(String cpf) {
+    getSession();
+    Criteria criteria = session.createCriteria(Usuarios.class);
+    criteria.add(Restrictions.eq("cpf", cpf));
+    boolean existe = criteria.uniqueResult() != null;
+    
+    transaction.commit();
+    session.close();
+    
+    return existe;
+}
 }

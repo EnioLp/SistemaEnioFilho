@@ -118,4 +118,5 @@ public class Usuarios implements java.io.Serializable {
     public void setAtivo(boolean ativo) {
         this.ativo = ativo;
     }
+
 }
