@@ -43,6 +43,8 @@ public class JDlgVendedor extends javax.swing.JDialog {
         defineEstadoInicial();
 
         try {
+            Util.validarLetras(jTextNome, 100);
+        Util.validarNumeros(jTextNumero, 20);
             mascaraCpf = new MaskFormatter("###.###.###-##");
             mascaraCnpj = new MaskFormatter("##.###.###/####-##");
             mascaraRg = new MaskFormatter("#.###.###");

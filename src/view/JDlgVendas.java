@@ -45,7 +45,7 @@ public class JDlgVendas extends javax.swing.JDialog {
         Util.validarNumeros(jTextCodigo, 10);
         Util.validarNumeros(jTextTotal, 100);
         Util.validarNumeros(jTextQuantidade, 10);
-    Util.validarNumeros(jFmtData, 100);
+        Util.validarNumeros(jFmtData, 100);
     }
 
     /**
@@ -99,6 +99,12 @@ public class JDlgVendas extends javax.swing.JDialog {
 
         jLabel5.setFont(new java.awt.Font("Georgia", 0, 12)); // NOI18N
         jLabel5.setText("Codigo do Livro");
+
+        jTextCodigo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextCodigoActionPerformed(evt);
+            }
+        });
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -296,6 +302,10 @@ public class JDlgVendas extends javax.swing.JDialog {
         Util.limpaCampos(jTextCodigo, jFmtData, jCBCliente, jCBVendedor, jTextQuantidade, jTextTotal);
             alterando = false;
     }//GEN-LAST:event_jBtnCancelarActionPerformed
+
+    private void jTextCodigoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextCodigoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextCodigoActionPerformed
 
     /**
      * @param args the command line arguments

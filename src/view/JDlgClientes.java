@@ -40,6 +40,9 @@ public class JDlgClientes extends javax.swing.JDialog {
         clientesDAO = new ClientesDAO();
         defineEstadoInicial();
         try {
+            Util.validarLetras(jTxtNome, 100);
+            Util.validarLetras(jTxtEstado, 2);
+            Util.validarNumeros(jTxtNumero, 20);
             mascaraCpf = new MaskFormatter("###.###.###-##");
             mascaraCep = new MaskFormatter("#####-###");
             mascaraTelefone = new MaskFormatter("(##) #####-####");

@@ -48,5 +48,6 @@ Contributor(s):
     <mapping class="bean.Usuarios"/>
     <mapping class="bean.Clientes"/>
     <mapping class="bean.Vendedor"/>
+    <mapping class="bean.Produtos"/>
   </session-factory>
 </hibernate-configuration>

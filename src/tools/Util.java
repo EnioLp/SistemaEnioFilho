@@ -183,4 +183,11 @@ public static Date strToDate(String texto) {
         return false;
     }
     }
+    
+     public static int strToInt(String texto) {
+        if (texto == null || texto.trim().isEmpty()) {
+            return 0; 
+        }
+        return Integer.parseInt(texto.trim());
+    }
 } 

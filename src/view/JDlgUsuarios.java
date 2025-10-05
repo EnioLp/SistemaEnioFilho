@@ -24,6 +24,8 @@ public class JDlgUsuarios extends javax.swing.JDialog {
         usuariosDAO = new UsuariosDAO();
         defineEstadoInicial();
         try {
+            Util.validarLetras(jTextNome, 100);
+            Util.validarLetras(jTextApelido, 50);
             mascaraCpf = new MaskFormatter("###.###.###-##");
             mascaraRg = new MaskFormatter("#.###.###");
             mascaraDataNascimento = new MaskFormatter("##/##/####");
