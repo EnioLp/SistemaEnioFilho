@@ -47,5 +47,6 @@ Contributor(s):
     <property name="hibernate.connection.username">root</property>
     <mapping class="bean.Usuarios"/>
     <mapping class="bean.Clientes"/>
+    <mapping class="bean.Vendedor"/>
   </session-factory>
 </hibernate-configuration>

@@ -1,66 +1,122 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package view;
 
+import DAO.VendedorDAO;
+import bean.Vendedor;
 import javax.swing.text.MaskFormatter;
 import tools.Util;
+import tools.WebServiceCep;
 
 /**
  *
  * @author eniof
  */
 public class JDlgVendedor extends javax.swing.JDialog {
-        private MaskFormatter mascaraCpf;
-        private MaskFormatter mascaraRg;
-        private MaskFormatter mascaraCnpj;
-        private MaskFormatter mascaraTelefone;
-        private MaskFormatter mascaraCep;
+    private VendedorDAO vendedorDAO;
+    private Vendedor vendedor;
+    private boolean incluindo;
+
+    private MaskFormatter mascaraCpf, mascaraCnpj, mascaraRg, mascaraCep, mascaraTelefone;;
+    
+     private void buscaCepAutomatico() {
+    String cep = jFmtCep.getText().replace("-", "").trim();
+    
+    if (cep.length() == 8) {
+        WebServiceCep.Cep cepObjeto = WebServiceCep.buscaCep(cep);
         
-    
-    
-    /**
-     * Creates new form JDlgVendedor
-     * @param parent
-     * @param modal
-     */
-           boolean alterando = false;
+        if (cepObjeto != null) {
+            jTextEstado.setText(cepObjeto.getUf());
+            jTextCidade.setText(cepObjeto.getCidade());
+            jTextEndereco.setText(cepObjeto.getLogradouro());
+        } else {
+            Util.mostrar("CEP não encontrado.");
+        }
+    }
+     }
     public JDlgVendedor(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        setTitle("Vendedor");
+        setTitle("Cadastro de Vendedores");
         setLocationRelativeTo(null);
+        
+        vendedorDAO = new VendedorDAO();
+        defineEstadoInicial();
 
-        Util.habilitar(false, jTextNome, jFmtCpf, jFmtRg, jFmtCnpj, jTextEmail, jFmtTelefone, jFmtCep, jTextEstado, jTextCidade, jTextEndereco, jTextNumero, jBtnConfirmar, jBtnCancelar,jBtnAlterar, jBtnExcluir);
-        Util.validarLetras(jTextNome, 255);
-        Util.validarNumeros(jFmtCpf, 10);
-        Util.validarNumeros(jFmtRg, 100);
-        Util.validarNumeros(jFmtCnpj, 10);
-        Util.validarNumeros(jFmtTelefone, 100);
-        Util.validarNumeros(jFmtCep, 100);
+        try {
+            mascaraCpf = new MaskFormatter("###.###.###-##");
+            mascaraCnpj = new MaskFormatter("##.###.###/####-##");
+            mascaraRg = new MaskFormatter("#.###.###");
+            mascaraCep = new MaskFormatter("#####-###");
+            mascaraTelefone = new MaskFormatter("(##) #####-####");
+            jFmtCpf.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(mascaraCpf));
+            jFmtCnpj.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(mascaraCnpj));
+            jFmtRg.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(mascaraRg));
+            jFmtCep.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(mascaraCep));
+            jFmtTelefone.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(mascaraTelefone));
+        } catch (java.text.ParseException ex) {
+            System.err.println("Erro na formatação: " + ex.getMessage());
+        }
+        jFmtCep.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            @Override
+            public void insertUpdate(javax.swing.event.DocumentEvent e) {
+                buscaCepAutomatico();
+            }
 
-          try {
-    mascaraCpf = new MaskFormatter("###.###.###-##");
-    mascaraRg = new MaskFormatter("##.###.###-#");
-    mascaraCnpj = new MaskFormatter("##.###.###/####-##");
-    mascaraTelefone = new MaskFormatter("(##) #####-#####");
-    mascaraCep = new MaskFormatter("######-###");
-    
+            @Override
+            public void removeUpdate(javax.swing.event.DocumentEvent e) {
+                buscaCepAutomatico();
+            }
 
-    jFmtCpf.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(mascaraCpf));
-    jFmtRg.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(mascaraRg));
-    jFmtCnpj.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(mascaraCnpj));
-    jFmtTelefone.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(mascaraTelefone));
-    jFmtCep.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(mascaraCep));
-    
-
-} catch (java.text.ParseException ex) {
-    System.err.println("Erro na formatação: " + ex.getMessage());
-}
+            @Override
+            public void changedUpdate(javax.swing.event.DocumentEvent e) {
+            }
+        });
     }
 
+    public void defineEstadoInicial() {
+        Util.habilitar(true, jBtnIncluir, jBtnPesquisar);
+        Util.habilitar(false, jBtnAlterar, jBtnExcluir, jBtnConfirmar, jBtnCancelar);
+        Util.habilitar(false, jTextNome, jFmtCpf, jFmtRg, jFmtCnpj, jTextEmail, jFmtTelefone, jFmtCep, jTextNumero, jTextEndereco, jTextEstado, jTextCidade);
+        Util.limpaCampos(jTextNome, jFmtCpf, jFmtRg, jFmtCnpj, jTextEmail, jFmtTelefone, jFmtCep, jTextNumero, jTextEndereco, jTextEstado, jTextCidade);
+    }
+
+    public Vendedor viewBean() {
+        Vendedor vendedorNovo = new Vendedor();
+
+        if (this.vendedor != null) {
+            vendedorNovo.setIdVendedor(this.vendedor.getIdVendedor());
+        }
+
+        vendedorNovo.setNome(jTextNome.getText());
+        vendedorNovo.setCpf(jFmtCpf.getText());
+        vendedorNovo.setRg(jFmtRg.getText());
+        vendedorNovo.setCnpj(jFmtCnpj.getText());
+        vendedorNovo.setEmail(jTextEmail.getText());
+        vendedorNovo.setTelefone(jFmtTelefone.getText());
+        vendedorNovo.setCep(jFmtCep.getText());
+        vendedorNovo.setNumero(jTextNumero.getText());
+        vendedorNovo.setEndereco(jTextEndereco.getText());
+        vendedorNovo.setEstado(jTextEstado.getText());
+        vendedorNovo.setCidade(jTextCidade.getText());
+        
+        return vendedorNovo;
+    }
+
+    public void beanView(Vendedor vendedor) {
+        this.vendedor = vendedor;
+
+        jTextNome.setText(vendedor.getNome());
+        jFmtCpf.setText(vendedor.getCpf());
+        jFmtRg.setText(vendedor.getRg());
+        jFmtCnpj.setText(vendedor.getCnpj());
+        jTextEmail.setText(vendedor.getEmail());
+        jFmtTelefone.setText(vendedor.getTelefone());
+        jFmtCep.setText(vendedor.getCep());
+        jTextNumero.setText(vendedor.getNumero());
+        jTextEndereco.setText(vendedor.getEndereco());
+        jTextEstado.setText(vendedor.getEstado());
+        jTextCidade.setText(vendedor.getCidade());
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -173,6 +229,12 @@ public class JDlgVendedor extends javax.swing.JDialog {
 
         jLabel9.setText("Numero");
 
+        jTextNome.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextNomeActionPerformed(evt);
+            }
+        });
+
         jTextEmail.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jTextEmailActionPerformed(evt);
@@ -186,6 +248,12 @@ public class JDlgVendedor extends javax.swing.JDialog {
         jFmtCpf.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jFmtCpfActionPerformed(evt);
+            }
+        });
+
+        jFmtRg.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jFmtRgActionPerformed(evt);
             }
         });
 
@@ -320,43 +388,76 @@ public class JDlgVendedor extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jBtnExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnExcluirActionPerformed
-        // TODO add your handling code here:
+    if (this.vendedor != null) {
+            if (Util.perguntar("Deseja realmente excluir o vendedor " + vendedor.getNome() + "?")) {
+                vendedorDAO.delete(vendedor);
+                Util.mostrar("Vendedor excluído com sucesso.");
+                defineEstadoInicial();
+            }
+        } else {
+            Util.mostrar("Nenhum vendedor foi carregado para exclusão.");
+        }
     }//GEN-LAST:event_jBtnExcluirActionPerformed
 
     private void jBtnPesquisarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnPesquisarActionPerformed
-        // TODO add your handling code here:
-        JDlgPesquisaVendedor jdlgPesquisaVendedor = new JDlgPesquisaVendedor(null, true);
-        jdlgPesquisaVendedor.setVisible(true);
+        JDlgPesquisaVendedor jDlgPesquisa = new JDlgPesquisaVendedor(null, true, this);
+        jDlgPesquisa.setVisible(true);
+
+        Util.habilitar(true, jBtnAlterar, jBtnExcluir, jBtnCancelar);
+        Util.habilitar(false, jBtnIncluir, jBtnConfirmar, jBtnPesquisar);
     }//GEN-LAST:event_jBtnPesquisarActionPerformed
 
     private void jBtnAlterarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnAlterarActionPerformed
-        // TODO add your handling code here:
+        incluindo = false;
+        Util.habilitar(true, jTextNome, jFmtCpf, jFmtRg, jFmtCnpj, jTextEmail, jFmtTelefone, jFmtCep, jTextNumero, jTextEndereco, jTextEstado, jTextCidade, jBtnConfirmar, jBtnCancelar);
+        Util.habilitar(false, jBtnIncluir, jBtnAlterar, jBtnExcluir, jBtnPesquisar);
+   
 
     }//GEN-LAST:event_jBtnAlterarActionPerformed
 
     private void jBtnIncluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnIncluirActionPerformed
-        // TODO add your handling code here:
-    Util.habilitar(true, jTextNome, jFmtCpf, jFmtRg, jFmtCnpj, jTextEmail, jFmtTelefone, jFmtCep, jTextEstado, jTextCidade, jTextEndereco, jTextNumero, jBtnConfirmar, jBtnCancelar);
-    Util.habilitar(false,jBtnPesquisar, jBtnIncluir, jBtnAlterar, jBtnExcluir);
-    Util.limpaCampos(jTextNome, jFmtCpf, jFmtRg, jFmtCnpj, jTextEmail, jFmtTelefone, jFmtCep, jTextEstado, jTextCidade, jTextEndereco, jTextNumero);
-                                           
+        incluindo = true;
+        this.vendedor = null;
+        defineEstadoInicial();
+        Util.habilitar(true, jTextNome, jFmtCpf, jFmtRg, jFmtCnpj, jTextEmail, jFmtTelefone, jFmtCep, jTextNumero, jTextEndereco, jTextEstado, jTextCidade, jBtnConfirmar, jBtnCancelar);
+        Util.habilitar(false, jBtnIncluir, jBtnAlterar, jBtnExcluir, jBtnPesquisar);
+                                              
     }//GEN-LAST:event_jBtnIncluirActionPerformed
 
     private void jBtnConfirmarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnConfirmarActionPerformed
-        // TODO add your handling code here:
-        JDlgPesquisaVendedor jdlgPesquisaVendedor = new JDlgPesquisaVendedor(null, true);
-        jdlgPesquisaVendedor.setVisible(true);
-        //VendedorDAO VendedorDAO= new VendedorDAO();
-        //VendedorDAO.insert(viewBean);
-        Util.habilitar(false);
-        Util.limpaCampos();
+        if (jTextNome.getText().trim().isEmpty()) {
+            Util.mostrar("O campo 'Nome' é obrigatório.");
+            return;
+        }
+        if (!Util.isCpfValido(jFmtCpf.getText())) {
+            Util.mostrar("O CPF digitado é inválido!");
+            return;
+        }
+
+        Vendedor vendedorParaSalvar = viewBean();
+        if (incluindo) {
+            if (vendedorDAO.cpfJaCadastrado(vendedorParaSalvar.getCpf())) {
+                Util.mostrar("Este CPF já está cadastrado.");
+                return;
+            }
+            if (vendedorDAO.cnpjJaCadastrado(vendedorParaSalvar.getCnpj())) {
+                Util.mostrar("Este CNPJ já está cadastrado.");
+                return;
+            }
+            vendedorDAO.insert(vendedorParaSalvar);
+            Util.mostrar("Vendedor incluído com sucesso!");
+        } else {
+            vendedorDAO.update(vendedorParaSalvar);
+            Util.mostrar("Vendedor alterado com sucesso!");
+        }
+
+        defineEstadoInicial();
     }//GEN-LAST:event_jBtnConfirmarActionPerformed
 
     private void jBtnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnCancelarActionPerformed
-        // TODO add your handling code here:
-    Util.habilitar(false, jTextNome, jFmtCpf, jFmtRg, jFmtCnpj, jTextEmail, jFmtTelefone, jFmtCep, jTextEstado, jTextCidade, jTextEndereco, jTextNumero);
-    Util.limpaCampos(jTextNome, jFmtCpf, jFmtRg, jFmtCnpj, jTextEmail, jFmtTelefone, jFmtCep, jTextEstado, jTextCidade, jTextEndereco, jTextNumero);
-            alterando = false;
+        this.vendedor = null;
+        defineEstadoInicial();
+        Util.mostrar("Operação cancelada.");
     }//GEN-LAST:event_jBtnCancelarActionPerformed
 
     private void jFmtCpfActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jFmtCpfActionPerformed
@@ -374,6 +475,14 @@ public class JDlgVendedor extends javax.swing.JDialog {
     private void jTextEmailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextEmailActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jTextEmailActionPerformed
+
+    private void jTextNomeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextNomeActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextNomeActionPerformed
+
+    private void jFmtRgActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jFmtRgActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jFmtRgActionPerformed
 
     /**
      * @param args the command line arguments

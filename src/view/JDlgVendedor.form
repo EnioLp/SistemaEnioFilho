@@ -292,6 +292,9 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="jTextNome">
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jTextNomeActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JTextField" name="jTextEmail">
       <Events>
@@ -322,6 +325,9 @@
       </Events>
     </Component>
     <Component class="javax.swing.JFormattedTextField" name="jFmtRg">
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jFmtRgActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JFormattedTextField" name="jFmtCnpj">
     </Component>
