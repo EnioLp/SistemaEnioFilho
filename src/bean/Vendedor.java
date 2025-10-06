@@ -48,10 +48,10 @@ public class Vendedor implements java.io.Serializable {
 
     @Column(name = "cidade", nullable = false, length = 30)
     private String cidade;
-
+    
     public Vendedor() {
     }
-
+    
     public int getIdVendedor() {
         return idVendedor;
     }
@@ -146,5 +146,33 @@ public class Vendedor implements java.io.Serializable {
 
     public void setCidade(String cidade) {
         this.cidade = cidade;
+    }
+     @Override
+    public String toString() {
+        return getNome();
+    }
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 53 * hash + this.idVendedor;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Vendedor other = (Vendedor) obj;
+        if (this.idVendedor != other.idVendedor) {
+            return false;
+        }
+        return true;
     }
 }

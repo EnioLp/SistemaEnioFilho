@@ -5,20 +5,41 @@
  */
 package view;
 
+import DAO.VendasDAO;
+import bean.Vendas;
+import java.util.List;
+import tools.Util;
+import tools.VendasController;
+
 /**
  *
  * @author eniof
  */
 public class JDlgPesquisaVendas extends javax.swing.JDialog {
+    private JDlgVendas jDlgVendas; // A tela de CADASTRO que chamou esta pesquisa
+    private VendasController vendasController;
 
     /**
      * Creates new form JDlgPesquisaVendas
      */
-    public JDlgPesquisaVendas(java.awt.Frame parent, boolean modal) {
+    public JDlgPesquisaVendas(java.awt.Frame parent, boolean modal,JDlgVendas jDlgVendas) {
         super(parent, modal);
         initComponents();
-        setTitle("Vendas");
+        setTitle("Pesquisa de Vendas");
         setLocationRelativeTo(null);
+      
+        this.jDlgVendas = jDlgVendas; // Guarda a referência da tela "pai"
+        
+        // Inicializa o DAO e o Controller
+        VendasDAO vendasDAO = new VendasDAO();
+        vendasController = new VendasController();
+        
+        // Define nosso controller como o modelo da JTable
+        jTableResultado.setModel(vendasController);
+        
+        // Busca todas as vendas no banco e as exibe na tabela
+        List<Vendas> lista = vendasDAO.listAll();
+        vendasController.setList(lista);
     }
 
     /**
@@ -31,12 +52,12 @@ public class JDlgPesquisaVendas extends javax.swing.JDialog {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        jTableResultado = new javax.swing.JTable();
         jButton2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        jTableResultado.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -47,7 +68,7 @@ public class JDlgPesquisaVendas extends javax.swing.JDialog {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(jTableResultado);
 
         jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/ok.png"))); // NOI18N
         jButton2.setText("OK");
@@ -87,54 +108,26 @@ public class JDlgPesquisaVendas extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
+       int linhaSel = jTableResultado.getSelectedRow();
+        
+        if (linhaSel != -1) {
+            Vendas vendaSelecionada = vendasController.getBean(linhaSel);
+            
+           
+            jDlgVendas.beanView(vendaSelecionada);
+
+            this.dispose();
+        } else {
+            Util.mostrar("Nenhuma venda selecionada.");
+        }
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(JDlgPesquisaVendas.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(JDlgPesquisaVendas.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(JDlgPesquisaVendas.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(JDlgPesquisaVendas.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
+    
 
-        /* Create and display the dialog */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                JDlgPesquisaVendas dialog = new JDlgPesquisaVendas(new javax.swing.JFrame(), true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    @Override
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable jTableResultado;
     // End of variables declaration//GEN-END:variables
 }

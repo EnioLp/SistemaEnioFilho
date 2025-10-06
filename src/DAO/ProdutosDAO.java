@@ -6,7 +6,6 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
-import DAO.HibernateUtil;
 
 public class ProdutosDAO {
 
@@ -65,4 +64,13 @@ public class ProdutosDAO {
         session.close();
         return lista;
     }
+    public Produtos findByCodigoLivro(String codigoLivro) {
+    getSession();
+    Criteria criteria = session.createCriteria(Produtos.class);
+    criteria.add(Restrictions.eq("codigoLivro", codigoLivro));
+    Produtos produtos = (Produtos) criteria.uniqueResult();
+    transaction.commit();
+    session.close();
+    return produtos;
+}
 }

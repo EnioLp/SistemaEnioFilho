@@ -1,21 +1,21 @@
 package tools;
 
-import bean.Produtos;
+import bean.Vendas;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
 import javax.swing.table.AbstractTableModel;
 
-public class ProdutosController extends AbstractTableModel {
+public class VendasController extends AbstractTableModel {
 
-    private List<Produtos> lista;
+    private List<Vendas> lista;
 
-    public void setList(List<Produtos> lista) {
+    public void setList(List<Vendas> lista) { 
         this.lista = lista;
         this.fireTableDataChanged();
     }
     
-    public Produtos getBean(int linha) {
+    public Vendas getBean(int linha) {
         return lista.get(linha);
     }
 
@@ -34,15 +34,19 @@ public class ProdutosController extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        Produtos produtos = lista.get(rowIndex);
+        Vendas venda = lista.get(rowIndex);
+        
         switch (columnIndex) {
-            case 0: return produtos.getCodigoLivro();
-            case 1: return produtos.getTitulo();
-            case 2: return produtos.getAutor();
-            case 3: return produtos.getEditora();
+            case 0: return venda.getIdVenda();
+            case 1: 
+                return Util.dateToStr(venda.getDataVenda());
+            case 2: 
+                return venda.getClientes().getNome();
+            case 3: 
+                return venda.getVendedor().getNome();
             case 4: 
                 NumberFormat formatoMoeda = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
-                return formatoMoeda.format(produtos.getPreco());
+                return formatoMoeda.format(venda.getValorTotal());
             default: return "";
         }
     }
@@ -51,10 +55,10 @@ public class ProdutosController extends AbstractTableModel {
     public String getColumnName(int column) {
         switch (column) {
             case 0: return "ID";
-            case 1: return "Título";
-            case 2: return "Autor";
-            case 3: return "Editora";
-            case 4: return "Preço";
+            case 1: return "Data da Venda";
+            case 2: return "Cliente";
+            case 3: return "Vendedor";
+            case 4: return "Valor Total";
             default: return "";
         }
     }

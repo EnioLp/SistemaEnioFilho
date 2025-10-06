@@ -5,49 +5,147 @@
  */
 package view;
 
+import DAO.ClientesDAO;
+import DAO.ProdutosDAO;
+import DAO.VendaProdutosDAO;
+import DAO.VendasDAO;
+import DAO.VendedorDAO;
+import bean.Clientes;
+import bean.Produtos;
+import bean.VendaProdutos;
+import bean.Vendas;
+import bean.Vendedor;
+import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.text.ParseException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 import javax.swing.text.MaskFormatter;
 import tools.Util;
+import tools.VendasProdutosController;
 
 /**
  *
  * @author eniof
  */
 public class JDlgVendas extends javax.swing.JDialog {
-
-    private MaskFormatter mascaraData;
-    /**
-     * Creates new form JDlgVendas
-     */
-     boolean alterando = false;
-    public JDlgVendas(java.awt.Frame parent, boolean modal) throws ParseException {
+    
+    private VendasProdutosController vendasProdutosController;
+    private List<VendaProdutos> listaVendaProduto; // "carrinho de compras"
+    private Vendas vendas;
+    private VendasDAO vendasDAO;
+    private ProdutosDAO produtosDAO;
+    private ClientesDAO clientesDAO;
+    private VendedorDAO vendedorDAO;
+    private VendaProdutosDAO vendaProdutosDAO;
+    private boolean incluindo;
+    
+    public JDlgVendas(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
+        listaVendaProduto = new ArrayList<>();
+        vendasProdutosController = new VendasProdutosController();
         initComponents();
-        setTitle("Vendas");
+        setTitle("Lançamento de Vendas");
         setLocationRelativeTo(null);
-        
-        Util.habilitar(false, jTextCodigo, jFmtData, jCBCliente, jCBVendedor, jTextQuantidade, jTextTotal , jBtnConfirmar, jBtnCancelar,jBtnAlterar, jBtnExcluir);
-        
-         try {
-    mascaraData = new MaskFormatter("##/##/####");
-    
+        jTextTotal.setEditable(false);
+        jTextTotal.setBackground(new java.awt.Color(225, 225, 225));
+        // Inicializa os DAOs
+        vendasDAO = new VendasDAO();
+        produtosDAO = new ProdutosDAO();
+        clientesDAO = new ClientesDAO();
+        vendedorDAO = new VendedorDAO();
+        vendaProdutosDAO = new VendaProdutosDAO();
 
-    jFmtData.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(mascaraData));
-    
+        // Conecta a lista ao controller e o controller à tabela
+        vendasProdutosController.setList(listaVendaProduto);
+        jTable1.setModel(vendasProdutosController); // Usando jTable1 como no seu código
 
-} catch (java.text.ParseException ex) {
-    System.err.println("Erro na formatação: " + ex.getMessage());
-}
-        
-        
-        Util.validarNumeros(jTextCodigo, 10);
-        Util.validarNumeros(jTextTotal, 100);
-        Util.validarNumeros(jTextQuantidade, 10);
-        Util.validarNumeros(jFmtData, 100);
+        // Carrega os combos e define o estado inicial
+        carregarCombos();
+        defineEstadoInicial();
     }
 
+    private void carregarCombos() {
+        // Carregar Clientes
+        List<Clientes> listaClientes = clientesDAO.listAll();
+        jCboCliente.removeAllItems();
+        for (Clientes cliente : listaClientes) {
+            jCboCliente.addItem(cliente);
+        }
+        
+        // Carregar Vendedores
+        List<Vendedor> listaVendedores = vendedorDAO.listAll();
+        jCboVendedor.removeAllItems();
+        for (Vendedor vendedor : listaVendedores) {
+            jCboVendedor.addItem(vendedor);
+        }
+    }
+    
+    public Vendas viewBean() {
+    Vendas venda = new Vendas();
+    
+    // Pega o objeto COMPLETO que está selecionado na JComboBox
+    // O "(Clientes)" é um "cast", para garantir que estamos pegando o tipo certo
+    venda.setClientes((Clientes) jCboCliente.getSelectedItem());
+    venda.setVendedor((Vendedor) jCboVendedor.getSelectedItem());
+    
+    // Pega a data do campo de texto e a converte
+    venda.setDataVenda(Util.strToDate(jFmtData.getText()));
+    
+    // Pega o valor total do campo de texto e o converte para BigDecimal
+    String totalStr = jTextTotal.getText().replace("R$ ", "").replace(".", "").replace(",", ".");
+    if (!totalStr.isEmpty()) {
+        venda.setValorTotal(new BigDecimal(totalStr));
+    } else {
+        venda.setValorTotal(BigDecimal.ZERO);
+    }
+    
+    return venda;
+    }
+    
+    public void beanView(Vendas vendas) {
+    this.vendas = vendas; // Supondo que você tenha uma variável "private Venda vendas;"
+
+    // Define a seleção nos JComboBox
+    // Para isso funcionar, as classes Clientes e Vendedor precisam ter os métodos equals() e hashCode()
+    jCboCliente.setSelectedItem(vendas.getClientes());
+    jCboVendedor.setSelectedItem(vendas.getVendedor());
+    
+    jFmtData.setText(Util.dateToStr(vendas.getDataVenda()));
+    jTextTotal.setText(vendas.getValorTotal().toPlainString());
+    
+    // Carrega os itens da venda na tabela
+    // Você precisaria de um método no seu VendaProdutoDAO para buscar os itens de uma venda específica
+    VendaProdutosDAO vendaProdutosDAO = new VendaProdutosDAO();
+    listaVendaProduto = vendaProdutosDAO.listByVenda(vendas); // Exemplo de método a ser criado
+    vendasProdutosController.setList(listaVendaProduto);
+    
+    recalcularTotal();
+}
+    
+    public void defineEstadoInicial() {
+        Util.habilitar(true, jBtnIncluir, jBtnPesquisar);
+        Util.habilitar(false, jBtnAlterar, jBtnExcluir, jBtnConfirmar, jBtnCancelar);
+        Util.habilitar(false, jTextCodigo, jFmtData, jCboCliente, jCboVendedor, jTextQuantidade, jTextTotal);
+        Util.limpaCampos(jTextCodigo, jFmtData, jTextQuantidade, jTextTotal);
+        jCboCliente.setSelectedIndex(-1);
+        jCboVendedor.setSelectedIndex(-1);
+        listaVendaProduto.clear();
+        vendasProdutosController.fireTableDataChanged();
+        recalcularTotal();
+    }
+    
+    private void recalcularTotal() {
+        BigDecimal total = BigDecimal.ZERO;
+        for (VendaProdutos vp : listaVendaProduto) {
+            BigDecimal subtotal = vp.getValorUnitario().multiply(new BigDecimal(vp.getQuantidade()));
+            total = total.add(subtotal);
+        }
+        NumberFormat formatoMoeda = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
+        jTextTotal.setText(formatoMoeda.format(total));
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -72,8 +170,8 @@ public class JDlgVendas extends javax.swing.JDialog {
         jBtnPesquisar = new javax.swing.JButton();
         jBtnAlterar = new javax.swing.JButton();
         jBtnIncluir = new javax.swing.JButton();
-        jCBCliente = new javax.swing.JComboBox<>();
-        jCBVendedor = new javax.swing.JComboBox<>();
+        jCboCliente = new javax.swing.JComboBox<>();
+        jCboVendedor = new javax.swing.JComboBox<>();
         jLabel6 = new javax.swing.JLabel();
         jTextQuantidade = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
@@ -140,6 +238,11 @@ public class JDlgVendas extends javax.swing.JDialog {
         jBtnExcluir.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jBtnExcluir.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Excluir.png"))); // NOI18N
         jBtnExcluir.setText("Excluir");
+        jBtnExcluir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnExcluirActionPerformed(evt);
+            }
+        });
 
         jBtnPesquisar.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jBtnPesquisar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/pesquisar.png"))); // NOI18N
@@ -163,12 +266,20 @@ public class JDlgVendas extends javax.swing.JDialog {
             }
         });
 
-        jCBCliente.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-
-        jCBVendedor.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jCboVendedor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCboVendedorActionPerformed(evt);
+            }
+        });
 
         jLabel6.setFont(new java.awt.Font("Georgia", 0, 12)); // NOI18N
         jLabel6.setText("Quantidade");
+
+        jTextQuantidade.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextQuantidadeActionPerformed(evt);
+            }
+        });
 
         jLabel7.setFont(new java.awt.Font("Georgia", 1, 14)); // NOI18N
         jLabel7.setText("Total");
@@ -219,11 +330,11 @@ public class JDlgVendas extends javax.swing.JDialog {
                                 .addComponent(jLabel4))
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(30, 30, 30)
-                                .addComponent(jCBCliente, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addComponent(jCboCliente, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(30, 30, 30)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel2)
-                            .addComponent(jCBVendedor, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jCboVendedor, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(30, 30, 30)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel6, javax.swing.GroupLayout.Alignment.TRAILING)
@@ -254,8 +365,8 @@ public class JDlgVendas extends javax.swing.JDialog {
                 .addGap(3, 3, 3)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jTextCodigo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jCBCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jCBVendedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jCboCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jCboVendedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jTextQuantidade, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jTextTotal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jFmtData, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -275,21 +386,77 @@ public class JDlgVendas extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jBtnConfirmarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnConfirmarActionPerformed
-        // TODO add your handling code here:
+        if (jCboCliente.getSelectedIndex() == -1) {
+        Util.mostrar("Selecione um cliente.");
+        return;
+    }
+    if (jCboVendedor.getSelectedIndex() == -1) {
+        Util.mostrar("Selecione um vendedor.");
+        return;
+    }
+    if (listaVendaProduto.isEmpty()) {
+        Util.mostrar("A venda precisa ter pelo menos um item.");
+        return;
+    }
+
+    // --- CRIAÇÃO DO OBJETO VENDA (MESTRE) ---
+    Vendas vendas = new Vendas();
+    // Pega o objeto completo do JComboBox, fazendo o "cast"
+    vendas.setClientes((Clientes) jCboCliente.getSelectedItem());
+    vendas.setVendedor((Vendedor) jCboVendedor.getSelectedItem());
+    vendas.setDataVenda(new Date()); // Pega a data e hora atual
+    
+    // Pega o valor total do campo de texto e converte para BigDecimal
+    String totalStr = jTextTotal.getText().replace("R$ ", "").replace(".", "").replace(",", ".");
+    vendas.setValorTotal(new BigDecimal(totalStr));
+
+    // --- SALVANDO NO BANCO DE DADOS ---
+    try {
+        // 1. Salva a Venda (o "mestre") primeiro
+        // O Hibernate irá preencher o ID da venda automaticamente após o insert
+        vendasDAO.insert(vendas);
+
+        // 2. Salva os Itens da Venda (os "detalhes")
+        VendaProdutosDAO vendaProdutosDAO = new VendaProdutosDAO();
+        for (VendaProdutos item : listaVendaProduto) {
+            // Liga o item à venda que acabamos de salvar
+            item.setVenda(vendas); 
+            
+            // Salva o item no banco
+            vendaProdutosDAO.insert(item);
+        }
+        
+        Util.mostrar("Venda salva com sucesso!");
+        defineEstadoInicial(); // Reseta a tela
+
+    } catch (Exception e) {
+        Util.mostrar("Ocorreu um erro ao salvar a venda: " + e.getMessage());
+        e.printStackTrace(); // Mostra o erro detalhado no console de saída
+    }
     }//GEN-LAST:event_jBtnConfirmarActionPerformed
 
     private void jBtnPesquisarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnPesquisarActionPerformed
-        // TODO add your handling code here:
-        JDlgPesquisaVendas jDlgPesquisaVendas = new JDlgPesquisaVendas(null, true);
-         //jdlgPesquisaLivros.setTelaAnterior(this);
-         jDlgPesquisaVendas.setVisible(true);
+        // Parte 1: Abre a tela de pesquisa e espera o usuário escolher um item.
+    // O programa fica "pausado" nesta linha até a tela de pesquisa fechar.
+    JDlgPesquisaVendas jDlgPesquisa = new JDlgPesquisaVendas(null, true, this);
+    jDlgPesquisa.setVisible(true);
+
+    // Parte 2: Este código SÓ EXECUTA DEPOIS que a tela de pesquisa é fechada.
+    // Ele é responsável por ajustar os botões para o modo "registro carregado".
+    // **NÃO CHAME defineEstadoInicial() AQUI.**
+
+    // Habilita os botões para as próximas ações possíveis: Alterar, Excluir ou Cancelar.
+    Util.habilitar(true, jBtnAlterar, jBtnExcluir, jBtnCancelar);
+
+    // Desabilita os botões que não fazem sentido agora.
+    Util.habilitar(false, jBtnIncluir, jBtnConfirmar, jBtnPesquisar);
     }//GEN-LAST:event_jBtnPesquisarActionPerformed
 
     private void jBtnIncluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnIncluirActionPerformed
         // TODO add your handling code here:
-        Util.habilitar(true, jTextCodigo, jFmtData, jCBCliente, jCBVendedor, jTextQuantidade, jTextTotal, jBtnConfirmar, jBtnCancelar);
+        Util.habilitar(true, jTextCodigo, jFmtData, jCboCliente, jCboVendedor, jTextQuantidade, jTextTotal, jBtnConfirmar, jBtnCancelar);
   Util.habilitar(false,jBtnPesquisar, jBtnIncluir, jBtnAlterar, jBtnExcluir);
-        Util.limpaCampos(jTextCodigo, jFmtData, jCBCliente, jCBVendedor, jTextQuantidade, jTextTotal);
+        Util.limpaCampos(jTextCodigo, jFmtData, jCboCliente, jCboVendedor, jTextQuantidade, jTextTotal);
     }//GEN-LAST:event_jBtnIncluirActionPerformed
 
     private void jFmtDataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jFmtDataActionPerformed
@@ -298,60 +465,72 @@ public class JDlgVendas extends javax.swing.JDialog {
 
     private void jBtnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnCancelarActionPerformed
         // TODO add your handling code here:
-        Util.habilitar(false, jTextCodigo, jFmtData, jCBCliente, jCBVendedor, jTextQuantidade, jTextTotal, jBtnConfirmar, jBtnCancelar);
-        Util.limpaCampos(jTextCodigo, jFmtData, jCBCliente, jCBVendedor, jTextQuantidade, jTextTotal);
-            alterando = false;
+        Util.habilitar(false, jTextCodigo, jFmtData, jCboCliente, jCboVendedor, jTextQuantidade, jTextTotal, jBtnConfirmar, jBtnCancelar);
+        Util.limpaCampos(jTextCodigo, jFmtData, jCboCliente, jCboVendedor, jTextQuantidade, jTextTotal);
+            incluindo = false;
     }//GEN-LAST:event_jBtnCancelarActionPerformed
 
     private void jTextCodigoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextCodigoActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jTextCodigoActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(JDlgVendas.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(JDlgVendas.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(JDlgVendas.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(JDlgVendas.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
+    private void jCboVendedorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCboVendedorActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jCboVendedorActionPerformed
 
-        /* Create and display the dialog */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                JDlgVendas dialog = null;
-                try {
-                    dialog = new JDlgVendas(new javax.swing.JFrame(), true);
-                } catch (ParseException ex) {
-                    Logger.getLogger(JDlgVendas.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    @Override
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
-        });
+    private void jBtnExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnExcluirActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jBtnExcluirActionPerformed
+
+    private void jTextQuantidadeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextQuantidadeActionPerformed
+                                           
+    // 1. Pega o CÓDIGO DO LIVRO digitado
+    String codigoLivroStr = jTextCodigo.getText(); // O nome da variável jTextCodigo pode ser outro
+    if (codigoLivroStr.isEmpty()) {
+        Util.mostrar("Primeiro, digite um código de produto.");
+        jTextCodigo.requestFocus();
+        return;
+    }
+
+    // 2. Busca o produto no banco usando o NOVO MÉTODO
+    Produtos produtos = produtosDAO.findByCodigoLivro(codigoLivroStr);
+
+    if (produtos != null) {
+        // 3. Pega a quantidade
+        String qtdStr = jTextQuantidade.getText();
+        if (qtdStr.isEmpty()) {
+            Util.mostrar("Digite a quantidade.");
+            return;
+        }
+
+        try {
+            int quantidade = Integer.parseInt(qtdStr);
+
+            // 4. Cria o item da venda e o adiciona na tabela
+            VendaProdutos vp = new VendaProdutos();
+            vp.setProduto(produtos);
+            vp.setQuantidade(quantidade);
+            vp.setValorUnitario(produtos.getPreco()); // Use getPreco(), que é o nome do método no bean Produto
+
+            listaVendaProduto.add(vp);
+            vendasProdutosController.fireTableDataChanged();
+
+            // 5. Limpa os campos para o próximo item
+            jTextCodigo.setText("");
+            jTextQuantidade.setText("");
+            jTextCodigo.requestFocus();
+            
+            // 6. Recalcula o valor total da venda
+            recalcularTotal();
+
+        } catch (NumberFormatException e) {
+            Util.mostrar("Quantidade inválida. Por favor, digite apenas números.");
+        }
+    } else {
+        Util.mostrar("Produto com o código " + codigoLivroStr + " não encontrado.");
+
+    }//GEN-LAST:event_jTextQuantidadeActionPerformed
+
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -361,8 +540,8 @@ public class JDlgVendas extends javax.swing.JDialog {
     private javax.swing.JButton jBtnExcluir;
     private javax.swing.JButton jBtnIncluir;
     private javax.swing.JButton jBtnPesquisar;
-    private javax.swing.JComboBox<String> jCBCliente;
-    private javax.swing.JComboBox<String> jCBVendedor;
+    private javax.swing.JComboBox<Clientes> jCboCliente;
+    private javax.swing.JComboBox<Vendedor> jCboVendedor;
     private javax.swing.JFormattedTextField jFmtData;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

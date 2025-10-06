@@ -1,23 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package view;
 
-import java.text.ParseException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-/**
- *
- * @author eniof
- */
 public class JFramePrincipal extends javax.swing.JFrame {
-
-    /**
-     * Creates new form JFramePrincipal
-     */
     public JFramePrincipal() {
         initComponents();
         setTitle("Menu");
@@ -137,32 +121,23 @@ public class JFramePrincipal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        // TODO add your handling code here:
-    JDlgUsuarios dlgUsuarios = new JDlgUsuarios(this, true);
-    dlgUsuarios.setVisible(true);
+       JDlgUsuarios dlgUsuarios = new JDlgUsuarios(this, true);
+       dlgUsuarios.setVisible(true);
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
-        // TODO add your handling code here:
-    JDlgClientes dlgClientes = new JDlgClientes(this, true);
-    dlgClientes.setVisible(true);
+       JDlgClientes dlgClientes = new JDlgClientes(this, true);
+       dlgClientes.setVisible(true);
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
-        // TODO add your handling code here:
-    JDlgVendedor dlgVendedor = new JDlgVendedor(this, true);
-    dlgVendedor.setVisible(true);
+       JDlgVendedor dlgVendedor = new JDlgVendedor(this, true);
+       dlgVendedor.setVisible(true);
     }//GEN-LAST:event_jMenuItem3ActionPerformed
 
     private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
-        // TODO add your handling code here:
-    JDlgVendas dlgVendas = null;
-        try {
-            dlgVendas = new JDlgVendas(this, true);
-        } catch (ParseException ex) {
-            Logger.getLogger(JFramePrincipal.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    dlgVendas.setVisible(true);
+       JDlgVendas jDlgVendas = new JDlgVendas(null, true);
+       jDlgVendas.setVisible(true);
     }//GEN-LAST:event_jMenuItem4ActionPerformed
 
     private void jMenu3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenu3ActionPerformed
@@ -170,45 +145,27 @@ public class JFramePrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenu3ActionPerformed
 
     private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem5ActionPerformed
-        // TODO add your handling code here:
         JDlgProdutos dlgLivros = new JDlgProdutos(this, true);
-    dlgLivros.setVisible(true);
+        dlgLivros.setVisible(true);
     }//GEN-LAST:event_jMenuItem5ActionPerformed
 
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(JFramePrincipal.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(JFramePrincipal.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(JFramePrincipal.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(JFramePrincipal.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new JFramePrincipal().setVisible(true);
-            }
-        });
+            
+public static void main(String args[]) {
+    try {
+        javax.swing.UIManager.setLookAndFeel(new com.formdev.flatlaf.FlatLightLaf());
+    } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+        System.err.println("Failed to initialize LaF");
     }
+
+    /* Create and display the form */
+    java.awt.EventQueue.invokeLater(() -> {
+        new JFramePrincipal().setVisible(true);
+    });
+}
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
