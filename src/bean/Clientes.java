@@ -12,7 +12,7 @@ import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "cliente", catalog = "meu_banco", 
+@Table(name = "cliente", catalog = "enio_filho", 
        uniqueConstraints = {
            @UniqueConstraint(columnNames = "email"),
            @UniqueConstraint(columnNames = "cpf")

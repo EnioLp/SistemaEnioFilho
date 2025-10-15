@@ -12,21 +12,17 @@ import javax.swing.JTextField;
 public class Util {
     
  public static void habilitar(boolean valor, JComponent... componentes) {
-        // A condição do laço 'for' foi corrigida para 'i < componentes.length'
-        for (int i = 0; i < componentes.length; i++) {
-            componentes[i].setEnabled(valor);
-        }
+     for (JComponent componente : componentes) {
+         componente.setEnabled(valor);
+     }
     }
 
     /**
      * @param componentes
      */
     public static void limpaCampos(JComponent... componentes) {
-        // O laço 'for' que estava faltando
         for (JComponent componente : componentes) {
-            // Verifica se o componente atual é um JTextField
             if (componente instanceof JTextField) {
-                // Se for, faz o "cast" e define seu texto como uma string vazia
                 ((JTextField) componente).setText("");
             }
         }
@@ -111,15 +107,11 @@ public class Util {
             }
         });
     }
-       // Dentro da classe Util.java
        
        
        
 public static Date strToDate(String texto) {
-    // ADICIONE ESTA LINHA PARA DEPURAÇÃO
     System.out.println("Texto da data para converter: '" + texto + "'");
-
-    // Remove a máscara e espaços para verificar se está realmente vazio
     String textoLimpo = texto.replace("/", "").trim();
     if (textoLimpo.isEmpty()) {
         return null;
@@ -131,7 +123,7 @@ public static Date strToDate(String texto) {
         return formato.parse(texto);
     } catch (ParseException e) {
         System.err.println("ERRO: O texto '" + texto + "' não está no formato dd/MM/yyyy.");
-        return null; // Retorna nulo se o formato estiver errado
+        return null;
     }
 }
     public static String dateToStr(Date data) {
@@ -145,31 +137,22 @@ public static Date strToDate(String texto) {
         JOptionPane.showMessageDialog(null, mensagem);
     }
     public static boolean perguntar(String pergunta) {
-        // Exibe uma caixa de diálogo de confirmação com os botões Sim e Não
         int resposta = JOptionPane.showConfirmDialog(null, pergunta, "Confirmação", JOptionPane.YES_NO_OPTION);
-        
-        // Retorna 'true' se o usuário clicou em "Sim", e 'false' caso contrário
         return resposta == JOptionPane.YES_OPTION;
     }
     public static boolean isCpfValido(String cpf) {
-    // Remove a formatação (pontos e traço)
     cpf = cpf.replace(".", "").replace("-", "").trim();
-
-    // 1. Verifica se o CPF tem 11 dígitos ou se é uma sequência de números iguais (ex: 111.111.111-11)
     if (cpf.length() != 11 || cpf.matches("(\\d)\\1{10}")) {
         return false;
     }
 
     try {
-        // --- CÁLCULO DO 1º DÍGITO VERIFICADOR ---
         int soma = 0;
         for (int i = 0; i < 9; i++) {
             soma += Character.getNumericValue(cpf.charAt(i)) * (10 - i);
         }
         int resto = 11 - (soma % 11);
         char digito10 = (resto == 10 || resto == 11) ? '0' : (char) (resto + '0');
-
-        // --- CÁLCULO DO 2º DÍGITO VERIFICADOR ---
         soma = 0;
         for (int i = 0; i < 10; i++) {
             soma += Character.getNumericValue(cpf.charAt(i)) * (11 - i);

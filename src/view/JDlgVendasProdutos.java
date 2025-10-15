@@ -5,18 +5,86 @@
  */
 package view;
 
+import DAO.ProdutosDAO;
+import bean.Produtos;
+import bean.VendaProdutos;
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.util.List;
+import java.util.Locale;
+import tools.Util;
+
 /**
  *
  * @author eniof
  */
 public class JDlgVendasProdutos extends javax.swing.JDialog {
-
-    /**
-     * Creates new form JDlgVendasProdutos
-     */
+    private VendaProdutos vendaProdutos;
+    private boolean okPressionado = false;
+    private final ProdutosDAO produtosDAO;
     public JDlgVendasProdutos(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        setTitle("Adicionar/Alterar Item");
+        setLocationRelativeTo(null);
+    
+        produtosDAO = new ProdutosDAO();
+        carregarComboProdutos();
+        
+        jFmtValorUnitario.setEditable(false);
+        jFmtTotalItem.setEditable(false);
+        jTxtQuantidade.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            @Override
+            public void insertUpdate(javax.swing.event.DocumentEvent e) { recalcularTotalItem(); }
+            @Override
+            public void removeUpdate(javax.swing.event.DocumentEvent e) { recalcularTotalItem(); }
+            @Override
+            public void changedUpdate(javax.swing.event.DocumentEvent e) {}
+        });
+        
+        jCboProduto.addActionListener(e -> recalcularTotalItem());
+    }
+
+    private void carregarComboProdutos() {
+        List<Produtos> listaProdutos = produtosDAO.listAll();
+        jCboProduto.removeAllItems();
+        for (Produtos produtos : listaProdutos) {
+            jCboProduto.addItem(produtos);
+        }
+    }
+    
+    public void preencherCampos(VendaProdutos vp) {
+        this.vendaProdutos = vp;
+        jCboProduto.setSelectedItem(vp.getProduto());
+        jTxtQuantidade.setText(String.valueOf(vp.getQuantidade()));
+        jFmtValorUnitario.setText(vp.getValorUnitario().toPlainString());
+        recalcularTotalItem();
+    }
+    
+    public VendaProdutos getVendaProduto() {
+        return this.vendaProdutos;
+    }
+    
+    public boolean isOkPressionado() {
+        return this.okPressionado;
+    }
+
+    private void recalcularTotalItem() {
+        if (jCboProduto.getSelectedIndex() != -1 && !jTxtQuantidade.getText().isEmpty()) {
+            try {
+                Produtos produtos = (Produtos) jCboProduto.getSelectedItem();
+                int quantidade = Integer.parseInt(jTxtQuantidade.getText());
+                BigDecimal valorUnitario = produtos.getPreco();
+                
+                jFmtValorUnitario.setText(valorUnitario.toPlainString());
+                
+                BigDecimal subtotal = valorUnitario.multiply(new BigDecimal(quantidade));
+                NumberFormat formatoMoeda = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
+                jFmtTotalItem.setText(formatoMoeda.format(subtotal));
+            } catch (NumberFormatException e) {
+                jFmtTotalItem.setText("R$ 0,00");
+            }
+        }
     }
 
     /**
@@ -28,21 +96,139 @@ public class JDlgVendasProdutos extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        jCboProduto = new javax.swing.JComboBox<>();
+        jTxtQuantidade = new javax.swing.JTextField();
+        jFmtValorUnitario = new javax.swing.JFormattedTextField();
+        jBtnOk = new javax.swing.JButton();
+        jBtnCancelar = new javax.swing.JButton();
+        jFmtTotalItem = new javax.swing.JFormattedTextField();
+
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+
+        jLabel1.setText("Produtos");
+
+        jLabel2.setText("Quantidade");
+
+        jLabel3.setText("Valor Unitario");
+
+        jLabel4.setText("Total");
+
+        jCboProduto.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCboProdutoActionPerformed(evt);
+            }
+        });
+
+        jBtnOk.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/ok.png"))); // NOI18N
+        jBtnOk.setText("OK");
+        jBtnOk.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnOkActionPerformed(evt);
+            }
+        });
+
+        jBtnCancelar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/cancelar.png"))); // NOI18N
+        jBtnCancelar.setText("Cancelar");
+        jBtnCancelar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnCancelarActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(265, 265, 265)
+                .addComponent(jBtnOk)
+                .addGap(18, 18, 18)
+                .addComponent(jBtnCancelar)
+                .addGap(0, 9, Short.MAX_VALUE))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(23, 23, 23)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jCboProduto, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel2)
+                                    .addComponent(jTxtQuantidade, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(42, 42, 42)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel3)
+                                    .addComponent(jFmtValorUnitario, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(41, 41, 41)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jFmtTotalItem, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel4))))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(28, 28, 28)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jCboProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(28, 28, 28)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(jLabel3)
+                    .addComponent(jLabel4))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jTxtQuantidade, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jFmtValorUnitario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jFmtTotalItem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(20, 20, 20)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jBtnOk, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jBtnCancelar))
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jBtnOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnOkActionPerformed
+        if (jCboProduto.getSelectedIndex() == -1) {
+            Util.mostrar("Selecione um produto.");
+            return;
+        }
+        if (jTxtQuantidade.getText().isEmpty() || Integer.parseInt(jTxtQuantidade.getText()) <= 0) {
+            Util.mostrar("A quantidade deve ser um número maior que zero.");
+            return;
+        }
+
+        if (this.vendaProdutos == null) {
+            this.vendaProdutos = new VendaProdutos();
+        }
+        
+        Produtos produtoSelecionado = (Produtos) jCboProduto.getSelectedItem();
+        this.vendaProdutos.setProduto(produtoSelecionado);
+        this.vendaProdutos.setQuantidade(Integer.parseInt(jTxtQuantidade.getText()));
+        this.vendaProdutos.setValorUnitario(produtoSelecionado.getPreco());
+        
+        this.okPressionado = true;
+        this.dispose();
+    }//GEN-LAST:event_jBtnOkActionPerformed
+
+    private void jBtnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnCancelarActionPerformed
+        this.okPressionado = false;
+        this.dispose();
+    }//GEN-LAST:event_jBtnCancelarActionPerformed
+
+    private void jCboProdutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCboProdutoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jCboProdutoActionPerformed
 
     /**
      * @param args the command line arguments
@@ -70,6 +256,7 @@ public class JDlgVendasProdutos extends javax.swing.JDialog {
             java.util.logging.Logger.getLogger(JDlgVendasProdutos.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
+        //</editor-fold>
 
         /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -87,5 +274,16 @@ public class JDlgVendasProdutos extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jBtnCancelar;
+    private javax.swing.JButton jBtnOk;
+    private javax.swing.JComboBox<Produtos> jCboProduto;
+    private javax.swing.JFormattedTextField jFmtTotalItem;
+    private javax.swing.JFormattedTextField jFmtValorUnitario;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JTextField jTxtQuantidade;
     // End of variables declaration//GEN-END:variables
+
 }

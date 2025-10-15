@@ -7,7 +7,6 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
-import DAO.HibernateUtil;
 
 public class VendaProdutosDAO {
 
@@ -60,7 +59,6 @@ public class VendaProdutosDAO {
     public List<VendaProdutos> listByVenda(Vendas venda) {
     getSession();
     Criteria criteria = session.createCriteria(VendaProdutos.class);
-    // Use o nome exato da variável no seu bean: "vendas" (plural)
     criteria.add(Restrictions.eq("vendas", venda)); 
     List<VendaProdutos> lista = criteria.list();
     transaction.commit();

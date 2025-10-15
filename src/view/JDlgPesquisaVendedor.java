@@ -6,13 +6,9 @@ import bean.Vendedor;
 import java.util.List;
 import tools.VendedorController;
 
-/**
- *
- * @author eniof
- */
 public class JDlgPesquisaVendedor extends javax.swing.JDialog {
-private JDlgVendedor jDlgVendedor;
-    private VendedorController vendedorController;
+    private final JDlgVendedor jDlgVendedor;
+    private final VendedorController vendedorController;
 
     public JDlgPesquisaVendedor(java.awt.Frame parent, boolean modal, JDlgVendedor jDlgVendedor) {
         super(parent, modal);

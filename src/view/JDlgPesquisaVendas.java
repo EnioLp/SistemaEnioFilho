@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package view;
 
 import DAO.VendasDAO;
@@ -11,16 +7,15 @@ import java.util.List;
 import tools.Util;
 import tools.VendasController;
 
-/**
- *
- * @author eniof
- */
 public class JDlgPesquisaVendas extends javax.swing.JDialog {
-    private JDlgVendas jDlgVendas; // A tela de CADASTRO que chamou esta pesquisa
-    private VendasController vendasController;
+    private final JDlgVendas jDlgVendas;
+    private final VendasController vendasController;
 
     /**
      * Creates new form JDlgPesquisaVendas
+     * @param parent
+     * @param modal
+     * @param jDlgVendas
      */
     public JDlgPesquisaVendas(java.awt.Frame parent, boolean modal,JDlgVendas jDlgVendas) {
         super(parent, modal);
@@ -28,16 +23,11 @@ public class JDlgPesquisaVendas extends javax.swing.JDialog {
         setTitle("Pesquisa de Vendas");
         setLocationRelativeTo(null);
       
-        this.jDlgVendas = jDlgVendas; // Guarda a referência da tela "pai"
+        this.jDlgVendas = jDlgVendas;
         
-        // Inicializa o DAO e o Controller
         VendasDAO vendasDAO = new VendasDAO();
         vendasController = new VendasController();
-        
-        // Define nosso controller como o modelo da JTable
         jTableResultado.setModel(vendasController);
-        
-        // Busca todas as vendas no banco e as exibe na tabela
         List<Vendas> lista = vendasDAO.listAll();
         vendasController.setList(lista);
     }

@@ -9,7 +9,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "produto", catalog = "meu_banco")
+@Table(name = "produto", catalog = "enio_filho")
 public class Produtos implements java.io.Serializable {
 
     @Id
@@ -103,5 +103,9 @@ public class Produtos implements java.io.Serializable {
 
     public void setPreco(BigDecimal preco) {
         this.preco = preco;
+    }
+    @Override
+    public String toString() {
+        return getTitulo(); 
     }
 }

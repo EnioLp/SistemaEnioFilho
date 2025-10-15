@@ -15,7 +15,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 @Entity
-@Table(name = "venda", catalog = "meu_banco")
+@Table(name = "venda", catalog = "enio_filho")
 public class Vendas implements java.io.Serializable {
 
     @Id

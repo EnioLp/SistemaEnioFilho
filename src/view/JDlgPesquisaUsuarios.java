@@ -6,14 +6,10 @@ import bean.Usuarios;
 import java.util.List;
 import tools.UsuariosController;
 
-/**
- *
- * @author eniof
- */
 public class JDlgPesquisaUsuarios extends javax.swing.JDialog {
 
-    private JDlgUsuarios jDlgUsuarios;
-    private UsuariosController usuariosController;
+    private final JDlgUsuarios jDlgUsuarios;
+    private final UsuariosController usuariosController;
 
     public JDlgPesquisaUsuarios(java.awt.Frame parent, boolean modal, JDlgUsuarios jDlgUsuarios) {
         super(parent, modal);

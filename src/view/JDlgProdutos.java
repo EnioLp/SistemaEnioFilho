@@ -7,11 +7,6 @@ import java.math.BigDecimal;
 import javax.swing.text.MaskFormatter;
 import tools.Util;
 
-/**
- *
- * @author eniof
- */
-
 public class JDlgProdutos extends javax.swing.JDialog {
     private ProdutosDAO produtosDAO;
     private Produtos produtos;

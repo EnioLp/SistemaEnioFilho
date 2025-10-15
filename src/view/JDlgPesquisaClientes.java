@@ -8,11 +8,14 @@ import tools.ClientesController;
 
 public class JDlgPesquisaClientes extends javax.swing.JDialog {
 
-    private JDlgClientes jDlgClientes;
-    private ClientesController clientesController;
+    private final JDlgClientes jDlgClientes;
+    private final ClientesController clientesController;
 
     /**
      * Creates new form JDlgPesquisaClientes
+     * @param parent
+     * @param modal
+     * @param jDlgClientes
      */
     public JDlgPesquisaClientes(java.awt.Frame parent, boolean modal, JDlgClientes jDlgClientes) {
         super(parent, modal);

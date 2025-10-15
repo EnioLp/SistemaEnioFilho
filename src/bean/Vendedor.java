@@ -8,7 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "vendedor", catalog = "meu_banco")
+@Table(name = "vendedor", catalog = "enio_filho")
 public class Vendedor implements java.io.Serializable {
 
     @Id
@@ -170,9 +170,6 @@ public class Vendedor implements java.io.Serializable {
             return false;
         }
         final Vendedor other = (Vendedor) obj;
-        if (this.idVendedor != other.idVendedor) {
-            return false;
-        }
-        return true;
+        return this.idVendedor == other.idVendedor;
     }
 }

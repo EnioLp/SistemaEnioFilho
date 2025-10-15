@@ -29,7 +29,7 @@ public class VendasProdutosController extends AbstractTableModel {
 
     @Override
     public int getColumnCount() {
-        return 4; 
+        return 3; 
     }
 
     @Override
@@ -42,9 +42,7 @@ public class VendasProdutosController extends AbstractTableModel {
                 return produtos.getCodigoLivro();
             case 1: 
                 return produtos.getTitulo();
-            case 2: 
-                return vendaProdutos.getQuantidade();
-            case 3:
+            case 2:
                 NumberFormat formatoMoeda = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
                 BigDecimal subtotal = vendaProdutos.getValorUnitario().multiply(new BigDecimal(vendaProdutos.getQuantidade()));
                 return formatoMoeda.format(subtotal);
@@ -58,8 +56,7 @@ public class VendasProdutosController extends AbstractTableModel {
         switch (column) {
             case 0: return "Cód. Produto";
             case 1: return "Título";
-            case 2: return "Quantidade";
-            case 3: return "Subtotal";
+            case 2: return "Subtotal";
             default: return "";
         }
     }

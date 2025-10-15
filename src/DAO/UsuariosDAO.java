@@ -5,8 +5,6 @@ import java.util.List;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import DAO.HibernateUtil;
-import bean.Clientes;
 import org.hibernate.criterion.Restrictions;
 
 public class UsuariosDAO {
